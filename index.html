@@ -235,6 +235,62 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
 .footer-link:hover{color:var(--green)}
 
 
+
+/* ── RESULTS OVERLAY ── */
+#results-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9997;
+  background: var(--paper, #fafaf7);
+  overflow-y: auto;
+  padding: 5rem 0 4rem;
+}
+#results-overlay.visible { display: block; }
+.results-overlay-inner {
+  max-width: 760px; margin: 0 auto; padding: 0 2rem;
+}
+.results-overlay-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border2, rgba(26,46,26,0.08));
+}
+.results-overlay-title {
+  font-family: var(--sans, 'Outfit', sans-serif);
+  font-size: 1.75rem; font-weight: 800; color: var(--ink, #1a2e1a);
+}
+.results-overlay-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.results-close-btn {
+  position: fixed; top: 1.25rem; right: 1.25rem;
+  background: var(--ink, #1a2e1a); color: #fff;
+  border: none; border-radius: 50%; width: 40px; height: 40px;
+  font-size: 1.2rem; cursor: pointer; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.results-close-btn:hover { background: var(--green, #2d6a2d); }
+.result-card {
+  background: #fff;
+  border: 1px solid rgba(26,46,26,0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.result-card-header {
+  padding: 0.875rem 1.25rem;
+  background: #e8eddf;
+  border-bottom: 1px solid rgba(26,46,26,0.08);
+  font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: #1a2e1a;
+}
+.result-card-body {
+  padding: 1.25rem;
+  font-size: 0.9rem; color: #3d5c3d; line-height: 1.75;
+}
+.result-card-body strong { color: #1a2e1a; }
+.result-card-body ul { padding-left: 1.25rem; margin: 0.5rem 0; }
+.result-card-body li { margin-bottom: 0.3rem; }
+
 /* ── ANALYSIS OVERLAY ── */
 #analysis-overlay {
   display: none;
@@ -511,7 +567,7 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
     <div class="payment-note">🔒 Secure payment via Stripe — <span id="price-note">$5 one-time, no subscription</span></div>
     <button id="analyzeBtn" class="submit-btn" onclick="startAnalysis()">Analyse my quote →</button>
 
-    <div class="progress-wrap" id="progressWrap">
+    <div class="progress-wrap" id="progressWrap" style="display:none">
       <div class="progress-title" id="progressTitle">Analysing your quote...</div>
       <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
       <div class="progress-msg" id="progressMsg">Reading your document...</div>
@@ -609,6 +665,22 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
     <div class="overlay-progress-fill" id="overlayProgressFill"></div>
   </div>
   <div class="overlay-msg" id="overlayMsg">Reading your document...</div>
+</div>
+
+
+<!-- RESULTS OVERLAY -->
+<div id="results-overlay">
+  <button class="results-close-btn" onclick="document.getElementById('results-overlay').classList.remove('visible')" title="Close">✕</button>
+  <div class="results-overlay-inner">
+    <div class="results-overlay-header">
+      <div class="results-overlay-title">Your Quote Analysis</div>
+      <div class="results-overlay-actions">
+        <button class="result-action-btn" onclick="downloadPDF()" style="display:flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;border:1.5px solid rgba(26,46,26,0.15);border-radius:100px;background:#fff;cursor:pointer;font-family:var(--sans);font-size:0.875rem;color:#1a2e1a;font-weight:500;">⬇ Download PDF</button>
+        <button class="result-action-btn" onclick="sendEmail()" style="display:flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;border:1.5px solid rgba(26,46,26,0.15);border-radius:100px;background:#fff;cursor:pointer;font-family:var(--sans);font-size:0.875rem;color:#1a2e1a;font-weight:500;">✉ Email report</button>
+      </div>
+    </div>
+    <div id="resultsOverlayContent"></div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -1187,10 +1259,18 @@ function renderResults(reportText, v1Reviews, v2Reviews, mode) {
     container.appendChild(el);
   });
 
+  // Copy to overlay and show it
+  const overlayContent = document.getElementById('resultsOverlayContent');
+  if (overlayContent) overlayContent.innerHTML = container.innerHTML;
+  const overlay = document.getElementById('results-overlay');
+  if (overlay) {
+    overlay.classList.add('visible');
+    overlay.scrollTop = 0;
+  }
+  // Also keep inline wrap visible for PDF download
   wrap.style.cssText = 'display:block !important;margin-top:2.5rem;';
   wrap.classList.add('visible');
   hideAnalysisOverlay();
-  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
 }
 
 function buildReviewHTML(r) {
@@ -1294,19 +1374,23 @@ async function sendEmailReport(email, report, v1Reviews, v2Reviews) {
     if (v2Reviews) reviewText += `\nVendor 2: ${v2Reviews.name} — ${v2Reviews.rating ? v2Reviews.rating.toFixed(1) + '/5' : 'No rating'} (${v2Reviews.reviews || 0} reviews)`;
 
     const summary = extractSummaryForEmail(report, reviewText);
-    // Send via EmailJS — variable names must match your template exactly
-    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+    // Send via EmailJS
+    const emailResult = await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
       to_email: email,
       to_name: email,
       from_name: 'CheckMyQuote AI',
       reply_to: 'checkmyquoteai@gmail.com',
       subject: 'Your CheckMyQuote AI Analysis Report',
-      message: summary,
+      message: summary.substring(0, 8000),
       email: email,
       user_email: email,
       name: email
     });
-  } catch(e) { console.error('Email send failed:', e); }
+    console.log('Email sent:', emailResult);
+  } catch(e) {
+    console.error('Email send failed:', e);
+    showToast('Email failed to send. Please use the Download PDF button instead.', 'error');
+  }
 }
 
 function extractSummaryForEmail(report, reviewText) {
