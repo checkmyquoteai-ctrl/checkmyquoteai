@@ -7,8 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>(function(){emailjs.init({publicKey:"svPirIJxttsKcnC26"});})();</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -437,7 +435,7 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
       <div class="step"><div class="step-num">01</div><div><div class="step-title">Upload your quote</div><div class="step-desc">PDF, image, Word doc, or screenshot. Single quote or side-by-side comparison of two vendors.</div></div></div>
       <div class="step"><div class="step-num">02</div><div><div class="step-title">AI reads every line</div><div class="step-desc">Extracts pricing, labour, materials, terms, and anything suspiciously missing from the quote.</div></div></div>
       <div class="step"><div class="step-num">03</div><div><div class="step-title">Vendor verification</div><div class="step-desc">We find the contractor on Google Places, pull their rating, and surface real customer reviews.</div></div></div>
-      <div class="step"><div class="step-num">04</div><div><div class="step-title">Full report delivered</div><div class="step-desc">On-screen results, PDF download, and email delivery — red flags, benchmarks, clear recommendation.</div></div></div>
+      <div class="step"><div class="step-num">04</div><div><div class="step-title">Full report delivered</div><div class="step-desc">On-screen results with PDF download — red flags, benchmarks, and a clear recommendation.</div></div></div>
     </div>
   </div>
 </div>
@@ -474,7 +472,7 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
       <div class="plan-name">Single</div>
       <div class="plan-price">$5<sub> / report</sub></div>
       <div class="plan-desc">One quote, full analysis.</div>
-      <ul class="plan-features"><li>Full AI analysis — 16 points</li><li>Market price benchmarks</li><li>Vendor Google lookup</li><li>Review summary</li><li>PDF + email report</li></ul>
+      <ul class="plan-features"><li>Full AI analysis — 16 points</li><li>Market price benchmarks</li><li>Vendor Google lookup</li><li>Review summary</li><li>PDF download report</li></ul>
       <button class="plan-btn" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Get started</button>
     </div>
     <div class="price-card featured">
@@ -578,7 +576,6 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
         <div class="results-title">Analysis Report</div>
         <div class="result-actions">
           <button class="result-action-btn" onclick="downloadPDF()">⬇ Download PDF</button>
-          <button class="result-action-btn" onclick="sendEmail()">✉ Email report</button>
         </div>
       </div>
       <div class="result-sections" id="resultSections"></div>
@@ -591,9 +588,9 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
   <div class="legal-inner">
     <h1>Privacy Policy</h1>
     <div class="legal-date">Effective January 1, 2025 · Last updated May 2025</div>
-    <h3>Information we collect</h3><p>Your email address for report delivery, uploaded quote files (processed in real-time, not stored), industry type and context you provide, and payment information processed securely by Stripe. We also collect anonymised usage analytics including industry category and analysis count.</p>
+    <h3>Information we collect</h3><p>Your email address (for your records) for report delivery, uploaded quote files (processed in real-time, not stored), industry type and context you provide, and payment information processed securely by Stripe. We also collect anonymised usage analytics including industry category and analysis count.</p>
     <h3>How we use it</h3><p>To deliver your AI quote analysis, send your report by email, compile aggregated business analytics, and detect fraud. We do not sell your personal information to third parties.</p>
-    <h3>Third-party services</h3><p>Stripe (payments), Anthropic Claude API (analysis), Google Places API (vendor lookups), EmailJS (report delivery), Netlify (hosting).</p>
+    <h3>Third-party services</h3><p>Stripe (payments), Anthropic Claude API (analysis), Google Places API (vendor lookups), Netlify (hosting).</p>
     <h3>Your rights</h3><p>Canadian users are protected under PIPEDA. EU/UK users have rights under GDPR including the right to erasure. Contact <a href="mailto:checkmyquoteai@gmail.com">checkmyquoteai@gmail.com</a> to access, correct, or delete your data.</p>
     <h3>Security</h3><p>We use HTTPS encryption and secure API communication. No internet transmission is 100% secure; we cannot guarantee absolute security.</p>
     <h3>Contact</h3><p><a href="mailto:checkmyquoteai@gmail.com">checkmyquoteai@gmail.com</a></p>
@@ -676,7 +673,6 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
       <div class="results-overlay-title">Your Quote Analysis</div>
       <div class="results-overlay-actions">
         <button class="result-action-btn" onclick="downloadPDF()" style="display:flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;border:1.5px solid rgba(26,46,26,0.15);border-radius:100px;background:#fff;cursor:pointer;font-family:var(--sans);font-size:0.875rem;color:#1a2e1a;font-weight:500;">⬇ Download PDF</button>
-        <button class="result-action-btn" onclick="sendEmail()" style="display:flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;border:1.5px solid rgba(26,46,26,0.15);border-radius:100px;background:#fff;cursor:pointer;font-family:var(--sans);font-size:0.875rem;color:#1a2e1a;font-weight:500;">✉ Email report</button>
       </div>
     </div>
     <div id="resultsOverlayContent"></div>
@@ -768,8 +764,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // API key handled server-side
 const GOOGLE_KEY = 'AIzaSyA1EMepZ1z-0_A-32SjZ9KRbKymelyHClQ';
-const EMAILJS_SERVICE = 'service_337eqhi';
-const EMAILJS_TEMPLATE = 'template__5fczksp';
 const ADMIN_PASS = 'CheckMyQuote2025!';
 
 let currentMode = 'single';
@@ -1045,8 +1039,7 @@ async function executeAnalysis(email, industry, context, mode, btn) {
     lastReport = reportText;
     renderResults(reportText, v1Reviews, v2Reviews, mode);
     saveAnalytics({ email, industry, type: mode, date: new Date().toISOString() });
-    await sendEmailReport(email, reportText, v1Reviews, v2Reviews);
-    showToast('Analysis complete! Report emailed to ' + email, 'success');
+    showToast('Analysis complete! Your report is ready.', 'success');
 
   } catch(err) {
     stopProgress();
@@ -1388,52 +1381,9 @@ async function downloadPDF() {
 }
 
 // EMAIL
-async function sendEmailReport(email, report, v1Reviews, v2Reviews) {
-  try {
-    let reviewText = '';
-    if (v1Reviews) reviewText += '\nVendor 1: ' + v1Reviews.name + ' — ' + (v1Reviews.rating ? v1Reviews.rating.toFixed(1) + '/5' : 'No rating') + ' (' + (v1Reviews.reviews || 0) + ' reviews)';
-    if (v2Reviews) reviewText += '\nVendor 2: ' + v2Reviews.name + ' — ' + (v2Reviews.rating ? v2Reviews.rating.toFixed(1) + '/5' : 'No rating') + ' (' + (v2Reviews.reviews || 0) + ' reviews)';
-    const summary = extractSummaryForEmail(report, reviewText);
 
-    const resp = await fetch('/api/email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: email, report: summary.substring(0, 8000) })
-    });
 
-    const result = await resp.json();
-    if (resp.ok && result.success) {
-      console.log('Email sent successfully');
-    } else {
-      throw new Error(result.error || 'Email API returned error');
-    }
-  } catch(e) {
-    console.error('Email failed:', e.message);
-    showToast('Email could not be sent. Please download your PDF.', 'error');
-  }
-}
 
-function extractSummaryForEmail(report, reviewText) {
-  const sections = parseReport(report);
-  return `CHECKMYQUOTE AI — ANALYSIS REPORT\n` +
-    `Generated: ${new Date().toLocaleDateString()}\n\n` +
-    `BOTTOM LINE\n${sections['BOTTOM LINE'] || ''}\n\n` +
-    `MARKET PRICE CHECK\n${sections['MARKET PRICE CHECK'] || ''}\n\n` +
-    `PRICE FAIRNESS\n${sections['PRICE FAIRNESS'] || ''}\n\n` +
-    `RED FLAGS\n${sections['RED FLAGS'] || ''}\n\n` +
-    `VENDOR REVIEWS${reviewText}\n\n` +
-    `BEST NEXT ACTION\n${sections['BEST NEXT ACTION'] || ''}\n\n` +
-    `---\nFull report details:\n\n` + report.substring(0, 3000) +
-    `\n\n---\nCheckmyquoteai.com`;
-}
-
-async function sendEmail() {
-  const email = document.getElementById('userEmail').value.trim();
-  if (!email || !email.includes('@')) { showToast('Enter a valid email first.', 'error'); return; }
-  if (!lastReport) { showToast('No report available to send.', 'error'); return; }
-  await sendEmailReport(email, lastReport, null, null);
-  showToast('Report sent to ' + email, 'success');
-}
 
 // ANALYTICS
 function saveAnalytics(entry) {
