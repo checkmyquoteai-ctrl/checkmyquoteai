@@ -12,7 +12,8 @@ export default async function handler(req, res) {
     const { to, report } = body;
     if (!to || !report) return res.status(400).json({ error: 'Missing to or report' });
 
-    const RESEND_KEY = process.env.RESEND_API_KEY || 're_u6acY1hJ_9PTyyY6pALHom8SLA6t9yHTp';
+    const RESEND_KEY = process.env.RESEND_API_KEY;
+    if (!RESEND_KEY) return res.status(500).json({ error: 'Email service not configured' });
 
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -43,7 +44,7 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    console.log('Resend response:', response.status, JSON.stringify(data));
+    console.log('Resend status:', response.status, JSON.stringify(data));
 
     if (response.ok) return res.status(200).json({ success: true });
     return res.status(500).json({ error: data.message || JSON.stringify(data) });
