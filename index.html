@@ -936,12 +936,12 @@ async function executeAnalysis(email, industry, context, mode, btn) {
     document.getElementById('progressMsg').textContent = 'Analysing pricing and key details...';
 
     const [resp1, resp2] = await Promise.all([
-      fetch('/.netlify/functions/analyze', {
+      fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages, mode: mode, part: 1 })
       }),
-      fetch('/.netlify/functions/analyze', {
+      fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages, mode: mode, part: 2 })
