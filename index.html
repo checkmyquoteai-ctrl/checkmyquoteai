@@ -670,7 +670,7 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
 
 <!-- RESULTS OVERLAY -->
 <div id="results-overlay">
-  <button class="results-close-btn" onclick="document.getElementById('results-overlay').classList.remove('visible');window.scrollTo({top:0,behavior:'smooth'});" title="Close">✕</button>
+  <button class="results-close-btn" onclick="document.getElementById('results-overlay').classList.remove('visible');document.body.scrollTop=0;document.documentElement.scrollTop=0;" title="Close">✕</button>
   <div class="results-overlay-inner">
     <div class="results-overlay-header">
       <div class="results-overlay-title">Your Quote Analysis</div>
@@ -680,6 +680,13 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
       </div>
     </div>
     <div id="resultsOverlayContent"></div>
+    
+    <div style="margin-top:2rem;padding:1.25rem;background:#f5f5f0;border-radius:8px;border-left:3px solid #2d6a2d;">
+      <p style="font-size:0.75rem;font-style:italic;color:#5a5a5a;line-height:1.6;margin:0 0 0.4rem 0;">
+        <strong>Disclaimer:</strong> CheckMyQuote AI provides AI-generated analysis for informational purposes only. It is not a substitute for professional legal, financial, or industry-specific advice. Always consult a qualified professional before making significant financial or contractual decisions. CheckMyQuote AI accepts no liability for decisions made based on this report.
+      </p>
+      <p style="font-size:0.75rem;color:#888;margin:0;text-align:center;letter-spacing:0.05em;">checkmyquoteai.com</p>
+    </div>
   </div>
 </div>
 
@@ -1362,6 +1369,20 @@ async function downloadPDF() {
     }
   });
 
+  // Add disclaimer at bottom
+  if (y > 240) { doc.addPage(); y = 20; }
+  y += 8;
+  doc.setFontSize(7);
+  doc.setTextColor(120,120,120);
+  doc.setFont('helvetica','italic');
+  const disclaimer = 'Disclaimer: CheckMyQuote AI provides AI-generated analysis for informational purposes only. Not a substitute for professional advice. Always consult a qualified professional before making significant financial or contractual decisions. CheckMyQuote AI accepts no liability for decisions made based on this report.';
+  const dLines = doc.splitTextToSize(disclaimer, pw);
+  dLines.forEach(dl => { if (y > 280) { doc.addPage(); y = 20; } doc.text(dl, margin, y); y += 4; });
+  y += 4;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(100,100,100);
+  doc.text('checkmyquoteai.com', 210/2, y, { align: 'center' });
   doc.save('CheckMyQuote-Analysis.pdf');
   showToast('PDF downloaded!', 'success');
 }
@@ -1374,32 +1395,21 @@ async function sendEmailReport(email, report, v1Reviews, v2Reviews) {
     if (v2Reviews) reviewText += '\nVendor 2: ' + v2Reviews.name + ' — ' + (v2Reviews.rating ? v2Reviews.rating.toFixed(1) + '/5' : 'No rating') + ' (' + (v2Reviews.reviews || 0) + ' reviews)';
     const summary = extractSummaryForEmail(report, reviewText);
 
-    // Try /api/email server-side first (most reliable)
     const resp = await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to: email, report: summary.substring(0, 8000) })
     });
 
-    if (resp.ok) {
-      console.log('Email sent via server');
-      return;
+    const result = await resp.json();
+    if (resp.ok && result.success) {
+      console.log('Email sent successfully');
+    } else {
+      throw new Error(result.error || 'Email API returned error');
     }
-
-    // Fallback to EmailJS
-    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-      to_email: email,
-      from_name: 'CheckMyQuote AI',
-      reply_to: 'checkmyquoteai@gmail.com',
-      subject: 'Your CheckMyQuote AI Analysis Report',
-      message: summary.substring(0, 5000),
-      email: email
-    });
-    console.log('Email sent via EmailJS');
-
   } catch(e) {
-    console.error('Email send failed:', e);
-    showToast('Could not send email. Please download your PDF report.', 'error');
+    console.error('Email failed:', e.message);
+    showToast('Email could not be sent. Please download your PDF.', 'error');
   }
 }
 
