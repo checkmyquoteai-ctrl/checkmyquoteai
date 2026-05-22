@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CheckMyQuote AI — Know Before You Sign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>(function(){emailjs.init({publicKey:"svPirIJxttsKcnC26"});})();</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a2e1a;
+  --ink2:#3d5c3d;
+  --ink3:#7a9a7a;
+  --paper:#fafaf7;
+  --paper2:#f0f2e8;
+  --paper3:#e8eddf;
+  --green:#2d6a2d;
+  --green-dark:#1f4e1f;
+  --green-light:#e8f0e8;
+  --gold:#b8860b;
+  --gold-light:#fef9e7;
+  --red:#c0392b;
+  --red-light:#fdf2f0;
+  --amber:#d97706;
+  --amber-light:#fffbeb;
+  --border:rgba(26,46,26,0.12);
+  --border2:rgba(26,46,26,0.08);
+  --sans:'Outfit',sans-serif;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --radius-xl:24px;
+  --shadow-sm:0 1px 3px rgba(26,46,26,0.08);
+  --shadow-md:0 4px 16px rgba(26,46,26,0.10);
+  --shadow-lg:0 12px 40px rgba(26,46,26,0.13);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:16px;line-height:1.6;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5vw;height:64px;
+  background:rgba(250,250,247,0.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border2);
+}
+.logo{font-family:var(--sans);font-size:1.2rem;font-weight:800;color:var(--ink);background:none;border:none;cursor:pointer;letter-spacing:-0.02em}
+.logo span{color:var(--green)}
+.nav-links{list-style:none;display:flex;gap:0.25rem}
+.nav-link{background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:0.875rem;font-weight:500;color:var(--ink2);padding:0.4rem 0.9rem;border-radius:var(--radius-sm);transition:all 0.15s}
+.nav-link:hover{color:var(--green);background:var(--green-light)}
+.nav-cta{background:var(--green);color:#fff;padding:0.5rem 1.25rem;border-radius:var(--radius-xl);font-family:var(--sans);font-size:0.875rem;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
+.nav-cta:hover{background:var(--green-dark);transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;padding-top:64px}
+.hero-left{display:flex;flex-direction:column;justify-content:center;padding:5rem 4vw 5rem 8vw;border-right:1px solid var(--border2)}
+.hero-eyebrow{font-size:0.72rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:1.5rem;display:flex;align-items:center;gap:0.6rem}
+.hero-eyebrow::before{content:"";width:20px;height:2px;background:var(--green);display:block;border-radius:2px}
+.hero h1{font-family:var(--sans);font-size:clamp(2.6rem,4.5vw,4.2rem);line-height:1.05;letter-spacing:-0.03em;font-weight:800;color:var(--ink);margin-bottom:1.5rem}
+.hero h1 em{font-style:normal;color:var(--green);position:relative}
+.hero-sub{font-size:1.05rem;color:var(--ink2);line-height:1.75;max-width:420px;margin-bottom:2.5rem;font-weight:400}
+.hero-btns{display:flex;gap:0.875rem;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:0.5rem;background:var(--green);color:#fff;padding:0.875rem 1.75rem;border-radius:var(--radius-xl);font-family:var(--sans);font-size:0.9375rem;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:all 0.2s;letter-spacing:0.01em}
+.btn-primary:hover{background:var(--green-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(45,106,45,0.3)}
+.btn-secondary{display:inline-flex;align-items:center;gap:0.5rem;background:transparent;color:var(--ink);padding:0.875rem 1.75rem;border-radius:var(--radius-xl);font-family:var(--sans);font-size:0.9375rem;font-weight:500;border:1.5px solid var(--border);cursor:pointer;text-decoration:none;transition:all 0.2s}
+.btn-secondary:hover{border-color:var(--green);color:var(--green)}
+.hero-trust{margin-top:2.5rem;display:flex;align-items:center;gap:1.25rem;font-size:0.8rem;color:var(--ink3)}
+.trust-avatars{display:flex}
+.trust-avatar{width:28px;height:28px;border-radius:50%;background:var(--paper3);border:2px solid var(--paper);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:var(--green-dark)}
+.trust-avatar:first-child{margin-left:0}
+
+/* ── HERO RIGHT ── */
+.hero-right{display:flex;align-items:center;justify-content:center;padding:5rem 8vw 5rem 4vw;background:var(--paper2)}
+.mockup-card{width:100%;max-width:400px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg)}
+.mockup-header{padding:1.1rem 1.5rem;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between}
+.mockup-title{font-weight:600;font-size:0.875rem;color:var(--ink)}
+.mockup-badge{font-size:0.68rem;font-weight:700;letter-spacing:0.06em;background:var(--green-light);color:var(--green);padding:0.25rem 0.75rem;border-radius:var(--radius-xl);text-transform:uppercase}
+.mockup-body{padding:1.25rem 1.5rem}
+.analysis-row{display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;border-bottom:1px solid var(--border2);font-size:0.875rem}
+.analysis-row:last-child{border-bottom:none}
+.row-label{color:var(--ink2);font-weight:400}
+.row-value{font-weight:600;color:var(--ink);text-align:right}
+.pill{font-size:0.72rem;padding:0.2rem 0.65rem;border-radius:var(--radius-xl);font-weight:600}
+.pill-green{background:var(--green-light);color:var(--green)}
+.pill-red{background:var(--red-light);color:var(--red)}
+.pill-amber{background:var(--amber-light);color:var(--amber)}
+.stars{color:var(--gold)}
+.mockup-footer{padding:0.9rem 1.5rem;background:var(--paper2);border-top:1px solid var(--border2);font-size:0.78rem;color:var(--ink3);display:flex;align-items:center;gap:0.5rem}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+
+/* ── HOW IT WORKS ── */
+.how-section{background:var(--ink);display:grid;grid-template-columns:1fr 1fr}
+.how-left{padding:6rem 4vw 6rem 8vw;border-right:1px solid rgba(255,255,255,0.07)}
+.how-left .section-label{color:rgba(232,240,232,0.4)}
+.how-left h2{color:#fff;margin-top:0.75rem;font-size:clamp(1.8rem,3vw,2.8rem)}
+.how-left h2 em{font-style:normal;color:var(--green);color:#6db96d}
+.how-left > p{color:rgba(255,255,255,0.55);margin-top:1.25rem;max-width:360px;font-weight:300;font-size:0.95rem;line-height:1.7}
+.how-right{padding:6rem 8vw 6rem 4vw}
+.steps{display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:52px 1fr;gap:1rem;padding:1.5rem 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.step:last-child{border-bottom:none}
+.step-num{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.4);flex-shrink:0;margin-top:2px}
+.step-title{font-weight:600;color:#fff;margin-bottom:0.3rem;font-size:0.9375rem}
+.step-desc{font-size:0.875rem;color:rgba(255,255,255,0.45);line-height:1.65;font-weight:300}
+
+/* ── SECTION COMMON ── */
+.section-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:0.75rem}
+h2{font-family:var(--sans);font-size:clamp(2rem,3.5vw,3rem);line-height:1.1;letter-spacing:-0.025em;font-weight:800;color:var(--ink)}
+h2 em{font-style:normal;color:var(--green)}
+
+/* ── FEATURES ── */
+.features-section{padding:6rem 8vw;background:var(--paper)}
+.features-head{max-width:600px;margin-bottom:3.5rem}
+.features-head p{color:var(--ink2);margin-top:0.875rem;font-weight:400;font-size:1rem;line-height:1.7}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.feature{background:#fff;border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.75rem;transition:all 0.2s}
+.feature:hover{box-shadow:var(--shadow-md);border-color:var(--border);transform:translateY(-2px)}
+.feature-icon{width:42px;height:42px;background:var(--green-light);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:1.1rem}
+.feature h3{font-size:0.9375rem;font-weight:700;margin-bottom:0.5rem;color:var(--ink)}
+.feature p{font-size:0.875rem;color:var(--ink2);line-height:1.65;font-weight:400}
+
+/* ── PRICING ── */
+.pricing-section{padding:6rem 8vw;background:var(--paper2)}
+.pricing-head{text-align:center;margin-bottom:3.5rem}
+.pricing-head p{color:var(--ink2);margin-top:0.875rem;font-weight:400}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:920px;margin:0 auto}
+.price-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;display:flex;flex-direction:column;position:relative;transition:all 0.2s}
+.price-card:hover{box-shadow:var(--shadow-md)}
+.price-card.featured{border-color:var(--green);border-width:2px;box-shadow:0 0 0 4px rgba(45,106,45,0.06)}
+.featured-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 1rem;border-radius:var(--radius-xl);white-space:nowrap}
+.plan-name{font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:0.875rem}
+.plan-price{font-family:var(--sans);font-size:2.75rem;line-height:1;font-weight:800;color:var(--ink);margin-bottom:0.25rem}
+.plan-price sub{font-size:0.9rem;font-weight:400;color:var(--ink2);vertical-align:baseline}
+.plan-desc{font-size:0.875rem;color:var(--ink2);margin-bottom:1.5rem;font-weight:400}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:0.55rem;margin-bottom:2rem;flex:1}
+.plan-features li{font-size:0.875rem;color:var(--ink2);display:flex;gap:0.6rem;align-items:flex-start}
+.plan-features li::before{content:"✓";color:var(--green);font-weight:700;flex-shrink:0}
+.plan-btn{display:block;text-align:center;padding:0.8rem;border-radius:var(--radius-xl);font-size:0.9rem;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all 0.2s;text-decoration:none;border:1.5px solid var(--border);color:var(--ink);background:none}
+.plan-btn:hover{border-color:var(--green);color:var(--green)}
+.plan-btn-fill{background:var(--green);color:#fff;border-color:var(--green)}
+.plan-btn-fill:hover{background:var(--green-dark);border-color:var(--green-dark)}
+
+/* ── COMPARE CTA ── */
+.compare-cta{background:var(--green);padding:6rem 8vw;text-align:center}
+.compare-cta h2{color:#fff;max-width:600px;margin:0 auto 1rem}
+.compare-cta h2 em{color:rgba(255,255,255,0.75)}
+.compare-cta p{color:rgba(255,255,255,0.75);max-width:460px;margin:0 auto 2.5rem;font-weight:400}
+.compare-cta .btn-primary{background:#fff;color:var(--green);margin:0 auto}
+.compare-cta .btn-primary:hover{background:var(--paper2);box-shadow:0 6px 20px rgba(0,0,0,0.15)}
+
+/* ── FAQ ── */
+.faq-section{display:grid;grid-template-columns:1fr 2fr;gap:4rem;padding:6rem 8vw;background:var(--paper)}
+.faq-left h2{position:sticky;top:88px}
+.faq-items{display:flex;flex-direction:column}
+.faq-item{border-top:1px solid var(--border2)}
+.faq-q{width:100%;text-align:left;background:none;border:none;padding:1.4rem 0;cursor:pointer;font-family:var(--sans);font-size:0.9375rem;font-weight:500;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:1rem;transition:color 0.2s}
+.faq-q:hover{color:var(--green)}
+.faq-icon{font-size:1.2rem;flex-shrink:0;transition:transform 0.25s;color:var(--ink3)}
+.faq-a{display:none;padding-bottom:1.5rem;font-size:0.9rem;color:var(--ink2);line-height:1.7;font-weight:400}
+.faq-item.open .faq-icon{transform:rotate(45deg);color:var(--green)}
+.faq-item.open .faq-a{display:block}
+
+/* ── TOOL SECTION ── */
+.tool-section{padding:6rem 8vw;background:var(--paper2)}
+.tool-inner{max-width:660px;margin:0 auto}
+.tool-section h2{margin-bottom:0.5rem}
+.tool-sub{color:var(--ink2);font-weight:400;margin-bottom:2.5rem;font-size:1rem}
+.mode-tabs{display:flex;background:var(--paper3);border-radius:var(--radius-xl);padding:4px;width:fit-content;margin-bottom:2.5rem}
+.mode-tab{padding:0.55rem 1.4rem;border:none;background:none;cursor:pointer;font-family:var(--sans);font-size:0.875rem;font-weight:500;color:var(--ink2);border-radius:var(--radius-xl);transition:all 0.2s}
+.mode-tab.active{background:#fff;color:var(--green);font-weight:700;box-shadow:var(--shadow-sm)}
+.field-label{display:block;font-size:0.75rem;font-weight:700;color:var(--ink2);margin-bottom:0.5rem;letter-spacing:0.04em;text-transform:uppercase}
+.field-input{width:100%;padding:0.8rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius-md);font-family:var(--sans);font-size:0.9rem;color:var(--ink);background:#fff;outline:none;transition:border-color 0.2s;-webkit-appearance:none;appearance:none}
+.field-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(45,106,45,0.08)}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius-md);padding:2.25rem;text-align:center;cursor:pointer;background:#fff;position:relative;transition:all 0.2s}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--green);background:var(--green-light)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone-icon{font-size:1.75rem;margin-bottom:0.6rem}
+.upload-zone-title{font-size:0.9rem;font-weight:600;color:var(--ink);margin-bottom:0.2rem}
+.upload-zone-sub{font-size:0.78rem;color:var(--ink3)}
+.file-preview{display:inline-flex;align-items:center;gap:0.5rem;background:var(--green-light);border:1px solid rgba(45,106,45,0.2);border-radius:var(--radius-xl);padding:0.4rem 0.8rem;font-size:0.8rem;color:var(--green);margin-top:0.75rem;font-weight:500}
+.file-preview button{background:none;border:none;cursor:pointer;color:var(--green);font-size:1rem;line-height:1;padding:0;margin-left:0.25rem}
+.payment-note{background:#fff;border:1px solid var(--border2);border-radius:var(--radius-md);padding:0.8rem 1rem;margin-bottom:1.25rem;font-size:0.8rem;color:var(--ink2);display:flex;align-items:center;gap:0.5rem}
+.submit-btn{width:100%;padding:1rem;border:none;border-radius:var(--radius-xl);background:var(--green);color:#fff;font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s;letter-spacing:0.01em}
+.submit-btn:hover:not(:disabled){background:var(--green-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(45,106,45,0.3)}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── PROGRESS ── */
+.progress-wrap{display:none;padding:2rem 0;text-align:center}
+.progress-title{font-weight:600;color:var(--ink);margin-bottom:0.5rem}
+.progress-track{height:3px;background:var(--border);border-radius:99px;overflow:hidden;margin:0.75rem 0}
+.progress-fill{height:100%;background:var(--green);border-radius:99px;transition:width 0.4s;width:0%}
+.progress-msg{font-size:0.8rem;color:var(--ink3)}
+
+/* ── RESULTS ── */
+.results-wrap{display:none;margin-top:2.5rem}
+.results-wrap.visible{display:block}
+.results-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.results-title{font-family:var(--sans);font-size:1.4rem;font-weight:800;color:var(--ink)}
+.result-actions{display:flex;gap:0.5rem}
+.result-action-btn{display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius-xl);background:#fff;cursor:pointer;font-family:var(--sans);font-size:0.8rem;color:var(--ink2);transition:all 0.18s;font-weight:500}
+.result-action-btn:hover{border-color:var(--green);color:var(--green)}
+.result-sections{display:flex;flex-direction:column;gap:2px}
+.result-section{background:#fff;border:1px solid var(--border2);border-radius:var(--radius-md);overflow:hidden}
+.result-section-head{display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.25rem;background:var(--paper3);border-bottom:1px solid var(--border2)}
+.result-section-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink2)}
+.result-section-body{padding:1.25rem;font-size:0.9rem;color:var(--ink2);line-height:1.75}
+.result-section-body strong{color:var(--ink)}
+.result-section-body ul{padding-left:1.25rem;margin:0.5rem 0}
+.result-section-body li{margin-bottom:0.25rem}
+
+/* ── LEGAL ── */
+.legal-section{padding:6rem 8vw;background:var(--paper)}
+.legal-inner{max-width:680px}
+.legal-inner h1{font-family:var(--sans);font-size:clamp(2rem,3vw,2.6rem);font-weight:800;color:var(--ink);margin-bottom:0.5rem}
+.legal-date{font-size:0.78rem;color:var(--ink3);margin-bottom:2.5rem}
+.legal-inner h3{font-size:0.9375rem;font-weight:700;color:var(--ink);margin:1.75rem 0 0.5rem}
+.legal-inner p,.legal-inner li{font-size:0.9rem;color:var(--ink2);line-height:1.8;margin-bottom:0.75rem}
+.legal-inner ul{padding-left:1.5rem}
+.legal-inner a{color:var(--green)}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:0.8rem;color:var(--ink3);background:var(--paper)}
+.footer-logo{font-family:var(--sans);font-size:1.1rem;font-weight:800;color:var(--ink)}
+.footer-logo span{color:var(--green)}
+.footer-links{display:flex;gap:1.5rem}
+.footer-link{background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:0.8rem;color:var(--ink3);transition:color 0.15s}
+.footer-link:hover{color:var(--green)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:var(--ink);color:#fff;padding:1rem 1.25rem;border-radius:var(--radius-md);font-size:0.875rem;box-shadow:var(--shadow-lg);transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:320px;border-left:3px solid var(--green)}
+#toast.show{transform:translateY(0);opacity:1}
+
+/* ── ADMIN ── */
+#sec-admin{display:none;padding:6rem 8vw;background:var(--paper)}
+.admin-login-box{max-width:360px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem}
+.admin-login-box h2{font-size:1.5rem;font-weight:800;margin-bottom:1.5rem;color:var(--ink)}
+.stat-card{background:#fff;border:1px solid var(--border2);border-radius:var(--radius-md);padding:1.25rem}
+.stat-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink3);margin-bottom:0.5rem;font-weight:600}
+.stat-value{font-size:2rem;font-weight:800;color:var(--ink)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.hero-eyebrow{animation:fadeUp 0.5s ease both}
+.hero h1{animation:fadeUp 0.5s 0.1s ease both}
+.hero-sub{animation:fadeUp 0.5s 0.2s ease both}
+.hero-btns{animation:fadeUp 0.5s 0.3s ease both}
+.hero-trust{animation:fadeUp 0.5s 0.4s ease both}
+.mockup-card{animation:fadeUp 0.6s 0.2s ease both}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .hero-left{padding:5rem 6vw}
+  .how-section{grid-template-columns:1fr}
+  .how-left{border-right:none;border-bottom:1px solid rgba(255,255,255,0.07);padding:4rem 6vw}
+  .how-right{padding:4rem 6vw}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .pricing-grid{grid-template-columns:1fr;max-width:400px}
+  .faq-section{grid-template-columns:1fr;padding:4rem 6vw}
+  .faq-left h2{position:static;margin-bottom:2rem}
+  .nav-links{display:none}
+  .mode-tabs{width:100%}
+  .mode-tab{flex:1;text-align:center}
+}
+@media(max-width:600px){
+  .features-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">CheckMyQuote<span>AI</span></button>
+  <ul class="nav-links">
+    <li><button class="nav-link" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works</button></li>
+    <li><button class="nav-link" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Features</button></li>
+    <li><button class="nav-link" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Pricing</button></li>
+    <li><button class="nav-link" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">FAQ</button></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Get started</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">AI-powered quote analysis</div>
+    <h1>Know before<br>you <em>sign</em><br>anything.</h1>
+    <p class="hero-sub">Upload any contractor quote. Our AI breaks down pricing, spots red flags, verifies the vendor on Google, and delivers a full report — in seconds.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Analyse a quote →</button>
+      <button class="btn-secondary" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">See how it works</button>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-avatars">
+        <div class="trust-avatar">JM</div><div class="trust-avatar">SR</div>
+        <div class="trust-avatar">TK</div><div class="trust-avatar">AP</div>
+      </div>
+      <span>Trusted by homeowners &amp; small businesses</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="mockup-card">
+      <div class="mockup-header">
+        <span class="mockup-title">Quote Analysis Report</span>
+        <span class="mockup-badge">Complete</span>
+      </div>
+      <div class="mockup-body">
+        <div class="analysis-row"><span class="row-label">Quoted total</span><span class="row-value">$8,450</span></div>
+        <div class="analysis-row"><span class="row-label">Market rate estimate</span><span class="row-value">$6,200 – $7,800</span></div>
+        <div class="analysis-row"><span class="row-label">Pricing assessment</span><span class="row-value"><span class="pill pill-red">Above market</span></span></div>
+        <div class="analysis-row"><span class="row-label">Vendor verified</span><span class="row-value"><span class="pill pill-green">✓ Confirmed</span></span></div>
+        <div class="analysis-row"><span class="row-label">Google rating</span><span class="row-value"><span class="stars">★★★★</span>☆ 4.1 (63)</span></div>
+        <div class="analysis-row"><span class="row-label">Missing items</span><span class="row-value"><span class="pill pill-amber">2 flagged</span></span></div>
+        <div class="analysis-row"><span class="row-label">Overall risk</span><span class="row-value"><span class="pill pill-amber">Moderate</span></span></div>
+      </div>
+      <div class="mockup-footer"><span class="dot"></span><span>Report delivered · 2 min ago</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-section" id="how">
+  <div class="how-left">
+    <p class="section-label">The process</p>
+    <h2>From quote to clarity<br>in <em>minutes.</em></h2>
+    <p>Upload your quote. Our AI analyses the scope, cross-references market rates, verifies your contractor on Google, and delivers a clear report — on screen, as a PDF, and to your inbox.</p>
+  </div>
+  <div class="how-right">
+    <div class="steps">
+      <div class="step"><div class="step-num">01</div><div><div class="step-title">Upload your quote</div><div class="step-desc">PDF, image, Word doc, or screenshot. Single quote or side-by-side comparison of two vendors.</div></div></div>
+      <div class="step"><div class="step-num">02</div><div><div class="step-title">AI reads every line</div><div class="step-desc">Extracts pricing, labour, materials, terms, and anything suspiciously missing from the quote.</div></div></div>
+      <div class="step"><div class="step-num">03</div><div><div class="step-title">Vendor verification</div><div class="step-desc">We find the contractor on Google Places, pull their rating, and surface real customer reviews.</div></div></div>
+      <div class="step"><div class="step-num">04</div><div><div class="step-title">Full report delivered</div><div class="step-desc">On-screen results, PDF download, and email delivery — red flags, benchmarks, clear recommendation.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="features-head">
+    <p class="section-label">What's included</p>
+    <h2>Everything you need to<br><em>negotiate with confidence.</em></h2>
+    <p>Whether you're getting a roof replaced, a bathroom renovated, or an HVAC installed — you deserve to know if the quote is fair before you hand over a deposit.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature"><div class="feature-icon">📋</div><h3>Scope breakdown</h3><p>Every line item extracted and explained. Know exactly what you're paying for and what's been left out.</p></div>
+    <div class="feature"><div class="feature-icon">💰</div><h3>Price benchmarking</h3><p>AI compares quoted rates against real market ranges for your region and trade category.</p></div>
+    <div class="feature"><div class="feature-icon">⚠️</div><h3>Red flag detection</h3><p>Vague terms, missing warranty clauses, unusual payment structures — all flagged before you sign.</p></div>
+    <div class="feature"><div class="feature-icon">🔍</div><h3>Vendor lookup</h3><p>We find your contractor on Google, verify who they are, and surface their real address and reviews.</p></div>
+    <div class="feature"><div class="feature-icon">⭐</div><h3>Review summary</h3><p>Google reviews distilled into themes, sentiment trends, and patterns you need to know about.</p></div>
+    <div class="feature"><div class="feature-icon">⚖️</div><h3>Quote comparison</h3><p>Upload two quotes and get a structured side-by-side analysis with a clear winner recommendation.</p></div>
+    <div class="feature"><div class="feature-icon">📅</div><h3>Timeline analysis</h3><p>Reviews the proposed schedule and flags unrealistic deadlines compared to industry norms.</p></div>
+    <div class="feature"><div class="feature-icon">💳</div><h3>Payment terms</h3><p>Analyses deposit requirements and milestone structures — flags anything outside industry norms.</p></div>
+    <div class="feature"><div class="feature-icon">🛡️</div><h3>Warranty review</h3><p>What's covered, for how long, and any conditions that could void your warranty.</p></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="pricing-head">
+    <p class="section-label">Pricing</p>
+    <h2>Simple, transparent pricing.</h2>
+    <p>No subscription. Pay per report, or grab a bundle for ongoing projects.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="plan-name">Single</div>
+      <div class="plan-price">$5<sub> / report</sub></div>
+      <div class="plan-desc">One quote, full analysis.</div>
+      <ul class="plan-features"><li>Full AI analysis — 16 points</li><li>Market price benchmarks</li><li>Vendor Google lookup</li><li>Review summary</li><li>PDF + email report</li></ul>
+      <button class="plan-btn" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Get started</button>
+    </div>
+    <div class="price-card featured">
+      <div class="featured-badge">Most popular</div>
+      <div class="plan-name">Compare</div>
+      <div class="plan-price">$8<sub> / report</sub></div>
+      <div class="plan-desc">Two quotes, side-by-side.</div>
+      <ul class="plan-features"><li>Everything in Single</li><li>Two vendor analysis</li><li>Side-by-side comparison</li><li>Dual Google verification</li><li>Clear winner recommendation</li></ul>
+      <button class="plan-btn plan-btn-fill" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Analyse two quotes</button>
+    </div>
+    <div class="price-card">
+      <div class="plan-name">Bundle</div>
+      <div class="plan-price">$25<sub> / 10 reports</sub></div>
+      <div class="plan-desc">5 single + 5 compare reports.</div>
+      <ul class="plan-features"><li>5 single analyses</li><li>5 compare analyses</li><li>Credits never expire</li><li>All report types included</li><li>Best value</li></ul>
+      <button class="plan-btn" onclick="window.open('https://buy.stripe.com/bJe14ng3sf5h82o8Jj6c004','_blank')">Buy bundle</button>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE CTA -->
+<div class="compare-cta">
+  <h2>Getting two quotes?<br><em>Compare them properly.</em></h2>
+  <p>Our compare report shows you the real difference — not just price, but scope gaps, missing items, and which vendor has the stronger reputation.</p>
+  <button class="btn-primary" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Compare two quotes →</button>
+</div>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="faq-left">
+    <p class="section-label">Questions</p>
+    <h2>Frequently<br>asked.</h2>
+  </div>
+  <div class="faq-items">
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What file formats can I upload?<span class="faq-icon">+</span></button><div class="faq-a">We accept PDF, Word, Excel, JPEG, PNG, and screenshots. If your quote was emailed, a saved PDF or screenshot works perfectly.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How accurate is the price benchmarking?<span class="faq-icon">+</span></button><div class="faq-a">The AI uses trade category and regional data to estimate a reasonable range. Think of it as a knowledgeable second opinion, not a formal valuation.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What if the vendor can't be found on Google?<span class="faq-icon">+</span></button><div class="faq-a">We let you know clearly. A vendor with no Google presence isn't automatically a red flag, but it's worth knowing. We still deliver the full quote analysis.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is my quote data stored or shared?<span class="faq-icon">+</span></button><div class="faq-a">Your file is processed in real-time and not stored after analysis. We collect anonymised usage analytics but never share your quote content or personal data.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How long does a report take?<span class="faq-icon">+</span></button><div class="faq-a">Most reports are ready in under 60 seconds. The AI runs two parallel passes simultaneously so results appear quickly.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I use this for commercial quotes?<span class="faq-icon">+</span></button><div class="faq-a">Absolutely. We work with homeowners, property managers, and small businesses. The bundle plan is popular with businesses that get quotes regularly.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do bundle credits expire?<span class="faq-icon">+</span></button><div class="faq-a">No. Bundle credits are tied to your email address and never expire.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I get a refund?<span class="faq-icon">+</span></button><div class="faq-a">If the analysis fails due to a technical error on our end, we'll refund you in full. Because reports are delivered immediately, refunds aren't available once a report has been viewed. Email checkmyquoteai@gmail.com with any issues.</div></div>
+  </div>
+</section>
+
+<!-- TOOL SECTION -->
+<section class="tool-section" id="tool">
+  <div class="tool-inner">
+    <p class="section-label">Analyse a quote</p>
+    <h2>Upload your quote.</h2>
+    <p class="tool-sub">PDF, Word, Excel, JPG or PNG accepted. Results in under 60 seconds.</p>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-single" onclick="setMode('single')">Single quote — $5</button>
+      <button class="mode-tab" id="tab-compare" onclick="setMode('compare')">Compare two — $8</button>
+    </div>
+
+    <div style="margin-bottom:1.25rem">
+      <label class="field-label" id="upload1-label">Your quote</label>
+      <div class="upload-zone" id="zone1" ondragover="handleDrag(event,'zone1')" ondragleave="handleDragLeave(event,'zone1')" ondrop="handleDrop(event,'zone1','file1')">
+        <input type="file" id="file1" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" onchange="handleFile(event,'file1','preview1')">
+        <div class="upload-zone-icon">📎</div>
+        <div class="upload-zone-title">Drop your file here or click to browse</div>
+        <div class="upload-zone-sub">PDF, Word, Excel, JPG, PNG</div>
+      </div>
+      <div id="preview1"></div>
+    </div>
+
+    <div id="quote2-row" style="display:none;margin-bottom:1.25rem">
+      <label class="field-label">Second quote (Vendor 2)</label>
+      <div class="upload-zone" id="zone2" ondragover="handleDrag(event,'zone2')" ondragleave="handleDragLeave(event,'zone2')" ondrop="handleDrop(event,'zone2','file2')">
+        <input type="file" id="file2" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" onchange="handleFile(event,'file2','preview2')">
+        <div class="upload-zone-icon">📎</div>
+        <div class="upload-zone-title">Drop second quote here or click to browse</div>
+        <div class="upload-zone-sub">PDF, Word, Excel, JPG, PNG</div>
+      </div>
+      <div id="preview2"></div>
+    </div>
+
+    <div style="margin-bottom:1.25rem"><label class="field-label">Email address</label><input type="email" id="userEmail" class="field-input" placeholder="you@email.com"></div>
+    <div style="margin-bottom:1.25rem">
+      <label class="field-label">Industry</label>
+      <select id="industry" class="field-input" style="background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%237a9a7a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;background-size:20px;padding-right:2.5rem">
+        <option value="">Select industry...</option>
+        <option>Roofing</option><option>HVAC / Heating &amp; Cooling</option><option>Plumbing</option><option>Electrical</option><option>Construction / General Contractor</option><option>Landscaping / Lawn Care</option><option>Interior Design / Renovation</option><option>Flooring</option><option>Painting</option><option>Solar / Energy</option><option>IT Services / Software</option><option>Marketing / Advertising</option><option>Legal Services</option><option>Accounting / Finance</option><option>Medical / Healthcare</option><option>Auto / Vehicle Repair</option><option>Moving / Storage</option><option>Insurance</option><option>Real Estate</option><option>Other</option>
+      </select>
+    </div>
+    <div style="margin-bottom:1.25rem"><label class="field-label">Additional context <span style="text-transform:none;font-weight:400;color:var(--ink3)">(optional)</span></label><input type="text" id="context" class="field-input" placeholder="e.g. replacing roof on 2,400 sq ft home in Ontario"></div>
+
+    <div class="payment-note">🔒 Secure payment via Stripe — <span id="price-note">$5 one-time, no subscription</span></div>
+    <button id="analyzeBtn" class="submit-btn" onclick="startAnalysis()">Analyse my quote →</button>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-title" id="progressTitle">Analysing your quote...</div>
+      <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+      <div class="progress-msg" id="progressMsg">Reading your document...</div>
+    </div>
+
+    <div class="results-wrap" id="resultsWrap" style="display:none">
+      <div class="results-top">
+        <div class="results-title">Analysis Report</div>
+        <div class="result-actions">
+          <button class="result-action-btn" onclick="downloadPDF()">⬇ Download PDF</button>
+          <button class="result-action-btn" onclick="sendEmail()">✉ Email report</button>
+        </div>
+      </div>
+      <div class="result-sections" id="resultSections"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section class="legal-section" id="privacy">
+  <div class="legal-inner">
+    <h1>Privacy Policy</h1>
+    <div class="legal-date">Effective January 1, 2025 · Last updated May 2025</div>
+    <h3>Information we collect</h3><p>Your email address for report delivery, uploaded quote files (processed in real-time, not stored), industry type and context you provide, and payment information processed securely by Stripe. We also collect anonymised usage analytics including industry category and analysis count.</p>
+    <h3>How we use it</h3><p>To deliver your AI quote analysis, send your report by email, compile aggregated business analytics, and detect fraud. We do not sell your personal information to third parties.</p>
+    <h3>Third-party services</h3><p>Stripe (payments), Anthropic Claude API (analysis), Google Places API (vendor lookups), EmailJS (report delivery), Netlify (hosting).</p>
+    <h3>Your rights</h3><p>Canadian users are protected under PIPEDA. EU/UK users have rights under GDPR including the right to erasure. Contact <a href="mailto:checkmyquoteai@gmail.com">checkmyquoteai@gmail.com</a> to access, correct, or delete your data.</p>
+    <h3>Security</h3><p>We use HTTPS encryption and secure API communication. No internet transmission is 100% secure; we cannot guarantee absolute security.</p>
+    <h3>Contact</h3><p><a href="mailto:checkmyquoteai@gmail.com">checkmyquoteai@gmail.com</a></p>
+  </div>
+</section>
+
+<!-- TERMS -->
+<section class="legal-section" id="terms" style="background:var(--paper2)">
+  <div class="legal-inner">
+    <h1>Terms of Service</h1>
+    <div class="legal-date">Effective January 1, 2025 · Last updated May 2025</div>
+    <h3>Acceptance</h3><p>By using CheckMyQuote AI you agree to these Terms. If you do not agree, please do not use the service.</p>
+    <h3>Not professional advice</h3><p>All analysis is AI-generated for informational purposes only. It is not a substitute for professional legal, financial, or industry-specific advice. CheckMyQuote AI accepts no liability for decisions made based on AI-generated reports.</p>
+    <h3>User responsibilities</h3><ul><li>You must be at least 18 years of age</li><li>You must have the right to upload any documents you submit</li><li>You must provide a valid email address</li></ul>
+    <h3>Payments &amp; refunds</h3><p>All payments are processed by Stripe. Refunds are available only where analysis failed due to a server-side technical error. Contact checkmyquoteai@gmail.com within 7 days of purchase.</p>
+    <h3>Limitation of liability</h3><p>Our total liability shall not exceed the amount you paid for the specific analysis in question.</p>
+    <h3>Governing law</h3><p>These Terms are governed by the laws of the Province of Ontario, Canada.</p>
+    <h3>Contact</h3><p><a href="mailto:checkmyquoteai@gmail.com">checkmyquoteai@gmail.com</a></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">CheckMyQuote<span>AI</span></div>
+  <div class="footer-links">
+    <button class="footer-link" onclick="document.getElementById('privacy').scrollIntoView({behavior:'smooth'})">Privacy</button>
+    <button class="footer-link" onclick="document.getElementById('terms').scrollIntoView({behavior:'smooth'})">Terms</button>
+    <a href="mailto:checkmyquoteai@gmail.com" style="color:var(--ink3);text-decoration:none;font-size:0.8rem;transition:color 0.15s" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--ink3)'">Contact</a>
+  </div>
+  <span>© 2025 CheckMyQuote AI</span>
+</footer>
+
+<!-- ADMIN -->
+<div id="sec-admin">
+  <div id="adminLogin">
+    <div class="admin-login-box">
+      <h2>Admin</h2>
+      <div style="margin-bottom:1rem"><label class="field-label">Password</label><input type="password" id="adminPass" class="field-input" placeholder="Enter password"></div>
+      <button class="submit-btn" onclick="adminLogin()">Login</button>
+    </div>
+  </div>
+  <div id="adminDash" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+      <h2 style="font-size:1.75rem;font-weight:800">Analytics</h2>
+      <button class="result-action-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+    <div id="adminStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem"></div>
+    <div style="overflow-x:auto;background:#fff;border:1px solid var(--border2);border-radius:var(--radius-md)">
+      <table style="width:100%;border-collapse:collapse;font-size:0.875rem">
+        <thead><tr>
+          <th style="text-align:left;padding:0.75rem 1rem;background:var(--paper2);border-bottom:1px solid var(--border2);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink2);font-weight:700">Date</th>
+          <th style="text-align:left;padding:0.75rem 1rem;background:var(--paper2);border-bottom:1px solid var(--border2);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink2);font-weight:700">Type</th>
+          <th style="text-align:left;padding:0.75rem 1rem;background:var(--paper2);border-bottom:1px solid var(--border2);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink2);font-weight:700">Industry</th>
+          <th style="text-align:left;padding:0.75rem 1rem;background:var(--paper2);border-bottom:1px solid var(--border2);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink2);font-weight:700">Email</th>
+        </tr></thead>
+        <tbody id="adminTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+
+<script>
+// showSection maps to scroll for single-page layout
+function showSection(name) {
+  const map = {tool:'tool',how:'how',features:'features',pricing:'pricing',faq:'faq',privacy:'privacy',terms:'terms',admin:'sec-admin'};
+  const id = map[name] || name;
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (id === 'sec-admin') el.style.display = 'block';
+  el.scrollIntoView({behavior:'smooth'});
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Double-click logo = admin
+  document.querySelector('.logo').addEventListener('dblclick', function() {
+    document.getElementById('sec-admin').style.display = 'block';
+    document.getElementById('sec-admin').scrollIntoView({behavior:'smooth'});
+  });
+  // Stripe return
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('paid') === '1') {
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(function() {
+      document.getElementById('tool').scrollIntoView({behavior:'smooth'});
+      setTimeout(runAnalysisAfterPayment, 600);
+    }, 400);
+  }
+});
+</script>
+<script>
+
+
+
+
+// API key handled server-side
+const GOOGLE_KEY = 'AIzaSyA1EMepZ1z-0_A-32SjZ9KRbKymelyHClQ';
+const EMAILJS_SERVICE = 'service_337eqhi';
+const EMAILJS_TEMPLATE = 'template__5fczksp';
+const ADMIN_PASS = 'CheckMyQuote2025!';
+
+let currentMode = 'single';
+let file1Data = null;
+let file2Data = null;
+let lastReport = '';
+
+// NAV
+function showSection(name) {
+  document.querySelectorAll('section').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('active');
+  });
+  const sec = document.getElementById('sec-' + name);
+  if (sec) {
+    sec.style.display = 'block';
+    sec.classList.add('active');
+  }
+  window.scrollTo(0, 0);
+}
+
+function toggleMobileNav() {
+  document.getElementById('mobileNav').classList.toggle('open');
+}
+function closeMobileNav() {
+  document.getElementById('mobileNav').classList.remove('open');
+}
+
+// TOOL MODE
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('tab-single').classList.toggle('active', mode === 'single');
+  document.getElementById('tab-compare').classList.toggle('active', mode === 'compare');
+  document.getElementById('quote2-row').style.display = mode === 'compare' ? 'block' : 'none';
+  document.getElementById('upload1-label').textContent = mode === 'compare' ? 'Upload First Quote (Vendor 1)' : 'Upload Your Quote';
+  const price = mode === 'single' ? '$5' : '$8';
+  document.getElementById('price-note').textContent = (mode === 'single' ? 'Single quote analysis' : 'Two-quote comparison') + ': ' + price + ' one-time payment';
+  document.getElementById('analyzeBtn').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Analyze My Quote${mode === 'compare' ? 's' : ''} — ${price}`;
+}
+
+// FILE HANDLING
+function handleFile(event, inputId, previewId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  processFile(file, inputId, previewId);
+}
+function handleDrag(e, zoneId) {
+  e.preventDefault();
+  document.getElementById(zoneId).classList.add('dragover');
+}
+function handleDragLeave(e, zoneId) {
+  document.getElementById(zoneId).classList.remove('dragover');
+}
+function handleDrop(e, zoneId, inputId) {
+  e.preventDefault();
+  document.getElementById(zoneId).classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const previewId = inputId === 'file1' ? 'preview1' : 'preview2';
+  processFile(file, inputId, previewId);
+}
+
+function processFile(file, inputId, previewId) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const data = { name: file.name, type: file.type, base64: e.target.result.split(',')[1], raw: e.target.result };
+    if (inputId === 'file1') file1Data = data;
+    else file2Data = data;
+    const preview = document.getElementById(previewId);
+    preview.innerHTML = `
+      <div class="file-preview">
+        <div class="file-preview-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>
+        <span class="file-preview-name">${file.name}</span>
+        <button class="file-preview-remove" onclick="removeFile('${inputId}','${previewId}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeFile(inputId, previewId) {
+  if (inputId === 'file1') file1Data = null;
+  else file2Data = null;
+  document.getElementById(previewId).innerHTML = '';
+  document.getElementById(inputId).value = '';
+}
+
+// FILE TO TEXT
+async function fileToText(fileData) {
+  const ext = fileData.name.split('.').pop().toLowerCase();
+  const imageTypes = ['jpg','jpeg','png','gif','webp'];
+  if (imageTypes.includes(ext)) {
+    return { type: 'image', mediaType: fileData.type, base64: fileData.base64 };
+  }
+  // For PDFs and docs, send as base64 document
+  if (ext === 'pdf') {
+    return { type: 'document', mediaType: 'application/pdf', base64: fileData.base64 };
+  }
+  // For text-based files try to extract text
+  try {
+    const text = atob(fileData.base64);
+    return { type: 'text', content: text.replace(/[^\x20-\x7E\n\r\t]/g, ' ') };
+  } catch(e) {
+    return { type: 'text', content: 'Quote file: ' + fileData.name };
+  }
+}
+
+// GOOGLE PLACES
+async function getVendorReviews(vendorName) {
+  if (!vendorName || vendorName.length < 3) return null;
+  try {
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(vendorName)}&key=${GOOGLE_KEY}`;
+    const resp = await fetch(searchUrl);
+    const data = await resp.json();
+    if (data.results && data.results.length > 0) {
+      const place = data.results[0];
+      return {
+        name: place.name,
+        rating: place.rating,
+        reviews: place.user_ratings_total,
+        address: place.formatted_address,
+        placeId: place.place_id
+      };
+    }
+  } catch(e) {}
+  return null;
+}
+
+// PROGRESS
+let progressInterval;
+const progressSteps = [
+  [5, 'Reading your document...'],
+  [20, 'Extracting quote details...'],
+  [40, 'Checking market pricing...'],
+  [60, 'Analyzing terms and conditions...'],
+  [72, 'Looking up vendor reputation...'],
+  [85, 'Identifying red flags...'],
+  [95, 'Compiling your report...'],
+];
+function startProgress() {
+  let i = 0;
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('progressBar').style.width = '5%';
+  document.getElementById('progressMsg').textContent = progressSteps[0][1];
+  progressInterval = setInterval(() => {
+    if (i < progressSteps.length - 1) {
+      i++;
+      document.getElementById('progressBar').style.width = progressSteps[i][0] + '%';
+      document.getElementById('progressMsg').textContent = progressSteps[i][1];
+    }
+  }, 1800);
+}
+function stopProgress() {
+  clearInterval(progressInterval);
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressMsg').textContent = 'Analysis complete!';
+  setTimeout(() => { document.getElementById('progressWrap').style.display = 'none'; }, 800);
+}
+
+const STRIPE_SINGLE   = 'https://buy.stripe.com/aFacN52cC7CPfuQaRr6c002';
+const STRIPE_COMPARE  = 'https://buy.stripe.com/00w4gz3gGg9l3M82kV6c003';
+const STRIPE_BUNDLE   = 'https://buy.stripe.com/bJe14ng3sf5h82o8Jj6c004';
+const MAKE_CREDIT_CHECK = 'https://hook.us2.make.com/yh8q5wsmei0stc3g2bqxknvvb6ev3o1p';
+
+// CHECK BUNDLE CREDITS
+async function checkCredits(email, type) {
+  try {
+    const resp = await fetch(MAKE_CREDIT_CHECK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, type, action: 'check' })
+    });
+    const data = await resp.json();
+    return data; // { hasCredits: true/false, single: N, compare: N }
+  } catch(e) {
+    return { hasCredits: false };
+  }
+}
+
+async function deductCredit(email, type) {
+  try {
+    await fetch(MAKE_CREDIT_CHECK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, type, action: 'deduct' })
+    });
+  } catch(e) {}
+}
+
+// MAIN ANALYSIS
+async function startAnalysis() {
+  const email = document.getElementById('userEmail').value.trim();
+  const industry = document.getElementById('industry').value;
+  const context = document.getElementById('context').value.trim();
+
+  if (!file1Data) { showToast('Please upload a quote file first.', 'error'); return; }
+  if (currentMode === 'compare' && !file2Data) { showToast('Please upload the second quote for comparison.', 'error'); return; }
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email address.', 'error'); return; }
+  if (!industry) { showToast('Please select your industry.', 'error'); return; }
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Checking credits...';
+
+  // Check if user has bundle credits
+  const credits = await checkCredits(email, currentMode);
+
+  if (credits && credits.hasCredits) {
+    // They have bundle credits — deduct and go straight to analysis
+    await deductCredit(email, currentMode);
+    const remaining = currentMode === 'single' ? credits.single - 1 : credits.compare - 1;
+    showToast(`Bundle credit used. ${remaining} credit${remaining !== 1 ? 's' : ''} remaining.`, 'success');
+    btn.innerHTML = '<div class="spinner"></div> Analyzing...';
+    await executeAnalysis(email, industry, context, currentMode, btn);
+    return;
+  }
+
+  // No credits — save state and redirect to Stripe
+  const state = {
+    mode: currentMode, email, industry, context,
+    file1: { name: file1Data.name, type: file1Data.type, base64: file1Data.base64 },
+    file2: file2Data ? { name: file2Data.name, type: file2Data.type, base64: file2Data.base64 } : null,
+    ts: Date.now()
+  };
+  localStorage.setItem('cmq_pending', JSON.stringify(state));
+
+  const stripeUrl = currentMode === 'compare' ? STRIPE_COMPARE : STRIPE_SINGLE;
+  const returnUrl = window.location.href.split('?')[0] + '?paid=1';
+  window.location.href = stripeUrl + '?prefilled_email=' + encodeURIComponent(email) + '&success_url=' + encodeURIComponent(returnUrl);
+}
+
+// SHARED ANALYSIS EXECUTOR (used by both credit path and Stripe return path)
+async function executeAnalysis(email, industry, context, mode, btn) {
+  startProgress();
+  try {
+    const f1 = await fileToText(file1Data);
+    let f2 = null;
+    if (mode === 'compare' && file2Data) f2 = await fileToText(file2Data);
+
+    const messages = buildMessages(f1, f2, industry, context, mode);
+    // Two parallel calls to stay under Netlify 10s timeout
+    document.getElementById('progressMsg').textContent = 'Analysing pricing and key details...';
+
+    const [resp1, resp2] = await Promise.all([
+      fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages, mode: mode, part: 1 })
+      }),
+      fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages, mode: mode, part: 2 })
+      })
+    ]);
+
+    if (!resp1.ok) throw new Error('API error ' + resp1.status);
+    if (!resp2.ok) throw new Error('API error ' + resp2.status);
+
+    const [data1, data2] = await Promise.all([resp1.json(), resp2.json()]);
+    if (!data1.content || !data2.content) throw new Error(data1.error || data2.error || 'No response from API');
+
+    const reportText = data1.content[0].text + '\n\n' + data2.content[0].text;
+
+    const v1Name = extractVendorName(reportText, 1);
+    const v2Name = mode === 'compare' ? extractVendorName(reportText, 2) : null;
+    let v1Reviews = null, v2Reviews = null;
+    if (v1Name) v1Reviews = await getVendorReviews(v1Name);
+    if (v2Name) v2Reviews = await getVendorReviews(v2Name);
+
+    stopProgress();
+    lastReport = reportText;
+    renderResults(reportText, v1Reviews, v2Reviews, mode);
+    saveAnalytics({ email, industry, type: mode, date: new Date().toISOString() });
+    await sendEmailReport(email, reportText, v1Reviews, v2Reviews);
+    showToast('Analysis complete! Report emailed to ' + email, 'success');
+
+  } catch(err) {
+    stopProgress();
+    showToast('Analysis failed. Please try again. Error: ' + err.message, 'error');
+    console.error(err);
+  }
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Analyze Another Quote';
+  }
+}
+
+// Called after returning from Stripe with ?paid=1
+async function runAnalysisAfterPayment() {
+  const raw = localStorage.getItem('cmq_pending');
+  if (!raw) return;
+  let state;
+  try { state = JSON.parse(raw); } catch(e) { return; }
+  if (!state || Date.now() - state.ts > 3600000) { localStorage.removeItem('cmq_pending'); return; }
+
+  // Restore UI state
+  showSection('tool');
+  setMode(state.mode);
+  document.getElementById('userEmail').value = state.email;
+  document.getElementById('industry').value = state.industry;
+  document.getElementById('context').value = state.context || '';
+
+  file1Data = state.file1;
+  file2Data = state.file2;
+
+  if (file1Data) {
+    document.getElementById('preview1').innerHTML = `<div class="file-preview"><div class="file-preview-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div><span class="file-preview-name">${file1Data.name}</span></div>`;
+  }
+  if (file2Data) {
+    document.getElementById('preview2').innerHTML = `<div class="file-preview"><div class="file-preview-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div><span class="file-preview-name">${file2Data.name}</span></div>`;
+  }
+
+  localStorage.removeItem('cmq_pending');
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Analyzing...';
+  const { email, industry, context, mode } = state;
+  currentMode = mode;
+
+  const resumeBtn = document.getElementById('analyzeBtn');
+  resumeBtn.disabled = true;
+  resumeBtn.innerHTML = '<div class="spinner"></div> Analyzing...';
+
+  await executeAnalysis(email, industry, context, mode, resumeBtn);
+}
+
+function buildMessages(f1, f2, industry, context, mode) {
+  const systemPrompt = `You are CheckMyQuote AI, an expert quote analyst. Analyze the provided quote(s) and produce a structured report with ALL of the following sections. Be specific, practical, and direct. Use real dollar ranges when discussing pricing. For each section use this exact format:
+
+## BOTTOM LINE
+[Clear proceed / negotiate / reject recommendation with 2-3 sentence reason]
+
+## MARKET PRICE CHECK
+[Estimated fair market range for this type of work, with context]
+
+## QUOTE 1 BREAKDOWN
+[Detailed breakdown of all line items, pricing, and terms in Quote 1]
+
+${mode === 'compare' ? `## QUOTE 2 BREAKDOWN
+[Detailed breakdown of all line items, pricing, and terms in Quote 2]
+
+## COMPARISON DECISION
+[Clear winner with reasoning across all dimensions]` : '## DECISION\n[Go / negotiate / walk away — with specific reasoning]'}
+
+## TIMELINE
+[Review of proposed timeline, whether it's realistic, industry comparison]
+
+## PAYMENT TERMS
+[Analysis of deposit, milestones, final payment — flag anything unusual]
+
+## WARRANTY
+[What's covered, for how long, any conditions that could void it]
+
+## PRICE FAIRNESS
+[Rating: Well Below Market / Below Market / Fair / Above Market / Significantly Overpriced — with explanation]
+
+## VENDOR 1 NAME
+[Extract the exact business/vendor name from Quote 1 — just the name, nothing else]
+
+${mode === 'compare' ? `## VENDOR 2 NAME
+[Extract the exact business/vendor name from Quote 2 — just the name, nothing else]` : ''}
+
+## VENDOR 1 GOOGLE CHECK
+[Note that a live Google check will be appended — provide any other known reputation signals from the quote itself]
+
+${mode === 'compare' ? `## VENDOR 2 GOOGLE CHECK
+[Note that a live Google check will be appended — provide any other known reputation signals from the quote itself]` : ''}
+
+## WHATS INCLUDED
+[Bulleted list of everything explicitly included in the quote(s)]
+
+## WHATS MISSING
+[Bulleted list of common items for this type of work that are NOT mentioned in the quote]
+
+## RED FLAGS
+[List any concerning language, unusual clauses, vague terms, or warning signs. If none, say "No significant red flags identified."]
+
+## QUESTIONS TO ASK
+[5-10 specific, tailored questions the customer should ask the vendor(s) before signing]
+
+## BEST NEXT ACTION
+[Specific, actionable recommendation — what to do right now]
+
+Industry: ${industry}. ${context ? 'Additional context: ' + context : ''} Be thorough, honest, and practical.`;
+
+  const userContent = [];
+
+  if (f1.type === 'image') {
+    userContent.push({ type: 'image', source: { type: 'base64', media_type: f1.mediaType, data: f1.base64 } });
+    userContent.push({ type: 'text', text: 'This is Quote 1. Please analyze it.' });
+  } else if (f1.type === 'document') {
+    userContent.push({ type: 'document', source: { type: 'base64', media_type: f1.mediaType, data: f1.base64 } });
+    userContent.push({ type: 'text', text: 'This is Quote 1. Please analyze it.' });
+  } else {
+    userContent.push({ type: 'text', text: 'QUOTE 1:\n' + f1.content });
+  }
+
+  if (f2) {
+    if (f2.type === 'image') {
+      userContent.push({ type: 'image', source: { type: 'base64', media_type: f2.mediaType, data: f2.base64 } });
+      userContent.push({ type: 'text', text: 'This is Quote 2. Please compare it with Quote 1.' });
+    } else if (f2.type === 'document') {
+      userContent.push({ type: 'document', source: { type: 'base64', media_type: f2.mediaType, data: f2.base64 } });
+      userContent.push({ type: 'text', text: 'This is Quote 2. Please compare it with Quote 1.' });
+    } else {
+      userContent.push({ type: 'text', text: 'QUOTE 2:\n' + f2.content });
+    }
+  }
+
+  return [{ role: 'user', content: [{ type: 'text', text: systemPrompt }, ...userContent] }];
+}
+
+function extractVendorName(report, num) {
+  const key = num === 1 ? 'VENDOR 1 NAME' : 'VENDOR 2 NAME';
+  const regex = new RegExp('## ' + key + '\\s*\\n([^\\n#]+)');
+  const match = report.match(regex);
+  return match ? match[1].trim() : null;
+}
+
+// RENDER RESULTS
+const sectionConfig = [
+  { key: 'BOTTOM LINE', title: 'Bottom Line', icon: 'check', color: '#00a060', bg: '#e6faf2' },
+  { key: 'MARKET PRICE CHECK', title: 'Market Price Check', icon: 'dollar', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
+  { key: 'QUOTE 1 BREAKDOWN', title: 'Quote 1 Breakdown', icon: 'doc', color: '#1a3a5c', bg: 'rgba(26,58,92,0.08)' },
+  { key: 'QUOTE 2 BREAKDOWN', title: 'Quote 2 Breakdown', icon: 'doc', color: '#1a3a5c', bg: 'rgba(26,58,92,0.08)' },
+  { key: 'COMPARISON DECISION', title: 'Comparison Decision', icon: 'star', color: '#f0a500', bg: '#fffbeb' },
+  { key: 'DECISION', title: 'Decision', icon: 'star', color: '#f0a500', bg: '#fffbeb' },
+  { key: 'TIMELINE', title: 'Timeline', icon: 'cal', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
+  { key: 'PAYMENT TERMS', title: 'Payment Terms', icon: 'card', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
+  { key: 'WARRANTY', title: 'Warranty', icon: 'shield', color: '#00a060', bg: '#e6faf2' },
+  { key: 'PRICE FAIRNESS', title: 'Price Fairness', icon: 'chart', color: '#f0a500', bg: '#fffbeb' },
+  { key: 'WHATS INCLUDED', title: "What's Included", icon: 'check', color: '#00a060', bg: '#e6faf2' },
+  { key: 'WHATS MISSING', title: "What's Missing", icon: 'alert', color: '#e53e3e', bg: '#fff5f5' },
+  { key: 'RED FLAGS', title: 'Red Flags', icon: 'flag', color: '#e53e3e', bg: '#fff5f5' },
+  { key: 'VENDOR 1 GOOGLE CHECK', title: 'Vendor 1 — Google Check', icon: 'search', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
+  { key: 'VENDOR 2 GOOGLE CHECK', title: 'Vendor 2 — Google Check', icon: 'search', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
+  { key: 'QUESTIONS TO ASK', title: 'Questions to Ask', icon: 'question', color: '#1a3a5c', bg: 'rgba(26,58,92,0.08)' },
+  { key: 'BEST NEXT ACTION', title: 'Best Next Action', icon: 'arrow', color: '#00a060', bg: '#e6faf2' },
+];
+
+const icons = {
+  check: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>',
+  dollar: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  doc: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>',
+  star: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/></svg>',
+  cal: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  card: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+  shield: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  chart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+  alert: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  flag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+  search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  question: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  arrow: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>',
+};
+
+function renderResults(reportText, v1Reviews, v2Reviews, mode) {
+  const wrap = document.getElementById('resultsWrap');
+  const container = document.getElementById('resultSections');
+  container.innerHTML = '';
+
+  const sections = parseReport(reportText);
+
+  sectionConfig.forEach(cfg => {
+    if (cfg.key === 'QUOTE 2 BREAKDOWN' && mode !== 'compare') return;
+    if (cfg.key === 'VENDOR 2 GOOGLE CHECK' && mode !== 'compare') return;
+    if (cfg.key === 'COMPARISON DECISION' && mode !== 'compare') return;
+    if (cfg.key === 'DECISION' && mode === 'compare') return;
+    if (cfg.key === 'VENDOR 1 NAME' || cfg.key === 'VENDOR 2 NAME') return;
+
+    let content = sections[cfg.key] || '';
+    if (!content && cfg.key === 'QUOTE 2 BREAKDOWN') return;
+
+    // Inject Google reviews
+    if (cfg.key === 'VENDOR 1 GOOGLE CHECK' && v1Reviews) {
+      content = buildReviewHTML(v1Reviews) + (content ? '\n\n' + content : '');
+    }
+    if (cfg.key === 'VENDOR 2 GOOGLE CHECK' && v2Reviews) {
+      content = buildReviewHTML(v2Reviews) + (content ? '\n\n' + content : '');
+    }
+
+    if (!content) return;
+
+    const el = document.createElement('div');
+    el.className = 'result-section';
+    el.innerHTML = `
+      <div class="result-section-header">
+        <div class="result-section-icon" style="background:${cfg.bg};color:${cfg.color}">${icons[cfg.icon] || ''}</div>
+        <div class="result-section-title">${cfg.title}</div>
+      </div>
+      <div class="result-section-body">${formatContent(content)}</div>`;
+    container.appendChild(el);
+  });
+
+  wrap.style.display = 'block';
+  wrap.classList.add('visible');
+  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function buildReviewHTML(r) {
+  if (!r) return '';
+  const stars = r.rating ? '⭐ ' + r.rating.toFixed(1) + '/5' : 'No rating';
+  const reviews = r.reviews ? '(' + r.reviews.toLocaleString() + ' reviews)' : '';
+  return `**${r.name}** — ${stars} ${reviews}\n${r.address || ''}`;
+}
+
+function parseReport(text) {
+  const result = {};
+  const lines = text.split('\n');
+  let current = null;
+  let buffer = [];
+
+  lines.forEach(line => {
+    const match = line.match(/^##\s+(.+)/);
+    if (match) {
+      if (current) result[current] = buffer.join('\n').trim();
+      current = match[1].trim();
+      buffer = [];
+    } else if (current) {
+      buffer.push(line);
+    }
+  });
+  if (current) result[current] = buffer.join('\n').trim();
+  return result;
+}
+
+function formatContent(text) {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+    .replace(/\n\n+/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^([^<])/, '<p>$1')
+    .replace(/([^>])$/, '$1</p>');
+}
+
+// PDF DOWNLOAD
+async function downloadPDF() {
+  if (!lastReport) { showToast('No report to download yet.', 'error'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const margin = 20;
+  let y = 20;
+  const pw = doc.internal.pageSize.getWidth() - margin * 2;
+
+  doc.setFillColor(15, 39, 68);
+  doc.rect(0, 0, 210, 30, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('CheckMyQuote AI — Analysis Report', margin, 19);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Generated: ' + new Date().toLocaleDateString(), 210 - margin, 19, { align: 'right' });
+  y = 42;
+
+  doc.setTextColor(30, 42, 58);
+  const lines = lastReport.split('\n');
+  lines.forEach(line => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    const isHeader = line.startsWith('## ');
+    if (isHeader) {
+      y += 4;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(15, 39, 68);
+      const txt = line.replace('## ', '').toUpperCase();
+      doc.text(txt, margin, y);
+      doc.setDrawColor(0, 160, 96);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y + 2, margin + pw, y + 2);
+      y += 10;
+    } else if (line.trim()) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(74, 85, 104);
+      const wrapped = doc.splitTextToSize(line.replace(/\*\*/g, ''), pw);
+      wrapped.forEach(wl => {
+        if (y > 275) { doc.addPage(); y = 20; }
+        doc.text(wl, margin, y);
+        y += 5.5;
+      });
+    } else {
+      y += 3;
+    }
+  });
+
+  doc.save('CheckMyQuote-Analysis.pdf');
+  showToast('PDF downloaded!', 'success');
+}
+
+// EMAIL
+async function sendEmailReport(email, report, v1Reviews, v2Reviews) {
+  try {
+    let reviewText = '';
+    if (v1Reviews) reviewText += `\nVendor 1: ${v1Reviews.name} — ${v1Reviews.rating ? v1Reviews.rating.toFixed(1) + '/5' : 'No rating'} (${v1Reviews.reviews || 0} reviews)`;
+    if (v2Reviews) reviewText += `\nVendor 2: ${v2Reviews.name} — ${v2Reviews.rating ? v2Reviews.rating.toFixed(1) + '/5' : 'No rating'} (${v2Reviews.reviews || 0} reviews)`;
+
+    const summary = extractSummaryForEmail(report, reviewText);
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      to_email: email,
+      to_name: email,
+      from_name: 'CheckMyQuote AI',
+      reply_to: 'checkmyquoteai@gmail.com',
+      subject: 'Your Quote Analysis from CheckMyQuote AI',
+      message: summary,
+      email: email
+    });
+  } catch(e) { console.error('Email send failed:', e); }
+}
+
+function extractSummaryForEmail(report, reviewText) {
+  const sections = parseReport(report);
+  return `CHECKMYQUOTE AI — ANALYSIS REPORT\n` +
+    `Generated: ${new Date().toLocaleDateString()}\n\n` +
+    `BOTTOM LINE\n${sections['BOTTOM LINE'] || ''}\n\n` +
+    `MARKET PRICE CHECK\n${sections['MARKET PRICE CHECK'] || ''}\n\n` +
+    `PRICE FAIRNESS\n${sections['PRICE FAIRNESS'] || ''}\n\n` +
+    `RED FLAGS\n${sections['RED FLAGS'] || ''}\n\n` +
+    `VENDOR REVIEWS${reviewText}\n\n` +
+    `BEST NEXT ACTION\n${sections['BEST NEXT ACTION'] || ''}\n\n` +
+    `---\nFull report details:\n\n` + report.substring(0, 3000) +
+    `\n\n---\nCheckmyquoteai.com`;
+}
+
+async function sendEmail() {
+  const email = document.getElementById('userEmail').value.trim();
+  if (!email || !email.includes('@')) { showToast('Enter a valid email first.', 'error'); return; }
+  if (!lastReport) { showToast('No report available to send.', 'error'); return; }
+  await sendEmailReport(email, lastReport, null, null);
+  showToast('Report sent to ' + email, 'success');
+}
+
+// ANALYTICS
+function saveAnalytics(entry) {
+  const data = getAnalytics();
+  data.push(entry);
+  localStorage.setItem('cmq_analytics', JSON.stringify(data));
+}
+function getAnalytics() {
+  try { return JSON.parse(localStorage.getItem('cmq_analytics') || '[]'); } catch(e) { return []; }
+}
+
+// ADMIN
+function adminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASS) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminDash').style.display = 'block';
+    renderAdmin();
+  } else {
+    showToast('Incorrect password.', 'error');
+  }
+}
+function renderAdmin() {
+  const data = getAnalytics();
+  const stats = document.getElementById('adminStats');
+  const industries = {};
+  data.forEach(d => { industries[d.industry] = (industries[d.industry] || 0) + 1; });
+  const topIndustry = Object.entries(industries).sort((a,b) => b[1]-a[1])[0];
+
+  stats.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Analyses</div><div class="stat-value">${data.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Single Quotes</div><div class="stat-value">${data.filter(d=>d.type==='single').length}</div></div>
+    <div class="stat-card"><div class="stat-label">Comparisons</div><div class="stat-value">${data.filter(d=>d.type==='compare').length}</div></div>
+    <div class="stat-card"><div class="stat-label">Top Industry</div><div class="stat-value" style="font-size:16px">${topIndustry ? topIndustry[0] : '—'}</div></div>
+  `;
+
+  const tbody = document.getElementById('adminTable');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--gray-400);padding:24px;">No analyses yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.slice().reverse().slice(0, 50).map(d => `
+    <tr>
+      <td>${new Date(d.date).toLocaleDateString()}</td>
+      <td>${d.type === 'compare' ? 'Compare' : 'Single'}</td>
+      <td>${d.industry}</td>
+      <td>${d.email.replace(/(.{2}).+(@.+)/, '$1***$2')}</td>
+    </tr>`).join('');
+}
+function exportCSV() {
+  const data = getAnalytics();
+  const csv = ['Date,Type,Industry,Email'].concat(data.map(d => [d.date, d.type, d.industry, d.email].join(','))).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'checkmyquote-analytics.csv'; a.click();
+}
+
+// FAQ
+function toggleFaq(el) {
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+
+// TOAST
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  // Single-page scroll layout — no section hiding needed
+
+  // Double-click logo = admin
+  const logo = document.querySelector('.logo');
+  if (logo) logo.addEventListener('dblclick', () => {
+    const admin = document.getElementById('sec-admin');
+    if (admin) { admin.style.display = 'block'; admin.scrollIntoView({behavior:'smooth'}); }
+  });
+
+  // Stripe return
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('paid') === '1') {
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(() => {
+      const tool = document.getElementById('tool');
+      if (tool) tool.scrollIntoView({behavior:'smooth'});
+      setTimeout(runAnalysisAfterPayment, 600);
+    }, 400);
+  }
+});
+
+
+
+
+
+</script>
+</body>
+</html>
