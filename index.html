@@ -1178,20 +1178,19 @@ function renderResults(reportText, v1Reviews, v2Reviews, mode) {
     if (!content) return;
 
     const el = document.createElement('div');
-    el.className = 'result-section';
+    el.style.cssText = 'background:#fff;border:1px solid rgba(26,46,26,0.1);border-radius:10px;overflow:hidden;margin-bottom:4px;';
     el.innerHTML = `
-      <div class="result-section-header">
-        <div class="result-section-icon" style="background:${cfg.bg};color:${cfg.color}">${icons[cfg.icon] || ''}</div>
-        <div class="result-section-title">${cfg.title}</div>
+      <div style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.25rem;background:#e8eddf;border-bottom:1px solid rgba(26,46,26,0.08);">
+        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#1a2e1a;">${cfg.title}</div>
       </div>
-      <div class="result-section-body">${formatContent(content)}</div>`;
+      <div style="padding:1.25rem;font-size:0.9rem;color:#3d5c3d;line-height:1.75;">${formatContent(content)}</div>`;
     container.appendChild(el);
   });
 
-  wrap.style.display = 'block';
+  wrap.style.cssText = 'display:block !important;margin-top:2.5rem;';
   wrap.classList.add('visible');
   hideAnalysisOverlay();
-  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
 }
 
 function buildReviewHTML(r) {
