@@ -234,6 +234,47 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
 .footer-link{background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:0.8rem;color:var(--ink3);transition:color 0.15s}
 .footer-link:hover{color:var(--green)}
 
+
+/* ── ANALYSIS OVERLAY ── */
+#analysis-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(26,46,26,0.92);
+  backdrop-filter: blur(8px);
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 2rem;
+}
+#analysis-overlay.visible { display: flex; }
+.overlay-spinner {
+  width: 56px; height: 56px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: #6db96d;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 2rem;
+}
+.overlay-title {
+  font-family: var(--sans); font-size: 1.5rem; font-weight: 700;
+  color: #fff; margin-bottom: 0.75rem;
+}
+.overlay-sub {
+  font-family: var(--sans); font-size: 1rem; color: rgba(255,255,255,0.65);
+  max-width: 360px; line-height: 1.6; margin-bottom: 2rem;
+}
+.overlay-progress-track {
+  width: 280px; height: 3px;
+  background: rgba(255,255,255,0.15); border-radius: 99px; overflow: hidden;
+}
+.overlay-progress-fill {
+  height: 100%; background: #6db96d; border-radius: 99px;
+  width: 0%; transition: width 0.5s ease;
+}
+.overlay-msg {
+  font-family: var(--sans); font-size: 0.8rem;
+  color: rgba(255,255,255,0.45); margin-top: 1rem;
+}
+
 /* ── TOAST ── */
 #toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:var(--ink);color:#fff;padding:1rem 1.25rem;border-radius:var(--radius-md);font-size:0.875rem;box-shadow:var(--shadow-lg);transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:320px;border-left:3px solid var(--green)}
 #toast.show{transform:translateY(0);opacity:1}
@@ -558,10 +599,63 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
   </div>
 </div>
 
+
+<!-- ANALYSIS OVERLAY -->
+<div id="analysis-overlay">
+  <div class="overlay-spinner"></div>
+  <div class="overlay-title">Analysing your quote...</div>
+  <div class="overlay-sub">Our AI is reading every line, checking market rates, and verifying your vendor. This takes about 30 seconds.</div>
+  <div class="overlay-progress-track">
+    <div class="overlay-progress-fill" id="overlayProgressFill"></div>
+  </div>
+  <div class="overlay-msg" id="overlayMsg">Reading your document...</div>
+</div>
+
 <div id="toast"></div>
 
 
 <script>
+
+// ── ANALYSIS OVERLAY ──
+let overlayInterval;
+const overlaySteps = [
+  [8,  'Payment confirmed...'],
+  [20, 'Reading your document...'],
+  [38, 'Checking market pricing...'],
+  [55, 'Analysing terms and conditions...'],
+  [68, 'Looking up vendor on Google...'],
+  [80, 'Identifying red flags...'],
+  [92, 'Compiling your report...'],
+];
+
+function showAnalysisOverlay() {
+  const overlay = document.getElementById('analysis-overlay');
+  if (!overlay) return;
+  overlay.classList.add('visible');
+  document.getElementById('overlayProgressFill').style.width = '8%';
+  document.getElementById('overlayMsg').textContent = 'Payment confirmed...';
+  let i = 0;
+  overlayInterval = setInterval(() => {
+    if (i < overlaySteps.length - 1) {
+      i++;
+      document.getElementById('overlayProgressFill').style.width = overlaySteps[i][0] + '%';
+      document.getElementById('overlayMsg').textContent = overlaySteps[i][1];
+    }
+  }, 3000);
+}
+
+function hideAnalysisOverlay() {
+  clearInterval(overlayInterval);
+  const fill = document.getElementById('overlayProgressFill');
+  const msg = document.getElementById('overlayMsg');
+  if (fill) fill.style.width = '100%';
+  if (msg) msg.textContent = 'Analysis complete!';
+  setTimeout(() => {
+    const overlay = document.getElementById('analysis-overlay');
+    if (overlay) overlay.classList.remove('visible');
+  }, 600);
+}
+
 // showSection maps to scroll for single-page layout
 function showSection(name) {
   const map = {tool:'tool',how:'how',features:'features',pricing:'pricing',faq:'faq',privacy:'privacy',terms:'terms',admin:'sec-admin'};
@@ -582,10 +676,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('paid') === '1') {
     window.history.replaceState({}, '', window.location.pathname);
-    setTimeout(function() {
-      document.getElementById('tool').scrollIntoView({behavior:'smooth'});
-      setTimeout(runAnalysisAfterPayment, 600);
-    }, 400);
+    // Show immediate overlay so user knows something is happening
+    showAnalysisOverlay();
+    setTimeout(runAnalysisAfterPayment, 600);
   }
 });
 </script>
@@ -843,12 +936,12 @@ async function executeAnalysis(email, industry, context, mode, btn) {
     document.getElementById('progressMsg').textContent = 'Analysing pricing and key details...';
 
     const [resp1, resp2] = await Promise.all([
-      fetch('/api/analyze', {
+      fetch('/.netlify/functions/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages, mode: mode, part: 1 })
       }),
-      fetch('/api/analyze', {
+      fetch('/.netlify/functions/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages, mode: mode, part: 2 })
@@ -1097,7 +1190,8 @@ function renderResults(reportText, v1Reviews, v2Reviews, mode) {
 
   wrap.style.display = 'block';
   wrap.classList.add('visible');
-  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  hideAnalysisOverlay();
+  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
 }
 
 function buildReviewHTML(r) {
@@ -1201,14 +1295,17 @@ async function sendEmailReport(email, report, v1Reviews, v2Reviews) {
     if (v2Reviews) reviewText += `\nVendor 2: ${v2Reviews.name} — ${v2Reviews.rating ? v2Reviews.rating.toFixed(1) + '/5' : 'No rating'} (${v2Reviews.reviews || 0} reviews)`;
 
     const summary = extractSummaryForEmail(report, reviewText);
+    // Send via EmailJS — variable names must match your template exactly
     await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
       to_email: email,
       to_name: email,
       from_name: 'CheckMyQuote AI',
       reply_to: 'checkmyquoteai@gmail.com',
-      subject: 'Your Quote Analysis from CheckMyQuote AI',
+      subject: 'Your CheckMyQuote AI Analysis Report',
       message: summary,
-      email: email
+      email: email,
+      user_email: email,
+      name: email
     });
   } catch(e) { console.error('Email send failed:', e); }
 }
