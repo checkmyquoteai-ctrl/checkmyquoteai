@@ -1,24 +1,28 @@
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const body = req.body;
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const part = body.part || 1;
+    const mode = body.mode || 'single';
 
     const part1Sections = `## BOTTOM LINE
 ## MARKET PRICE CHECK
 ## QUOTE 1 BREAKDOWN
-## DECISION
+${mode === 'compare' ? '## QUOTE 2 BREAKDOWN\n## COMPARISON DECISION' : '## DECISION'}
 ## TIMELINE
 ## PAYMENT TERMS
 ## WARRANTY
@@ -27,6 +31,7 @@ export default async function handler(req, res) {
     const part2Sections = `## VENDOR 1 NAME
 ## VENDOR 2 NAME
 ## VENDOR 1 GOOGLE CHECK
+${mode === 'compare' ? '## VENDOR 2 GOOGLE CHECK' : ''}
 ## WHATS INCLUDED
 ## WHATS MISSING
 ## RED FLAGS
