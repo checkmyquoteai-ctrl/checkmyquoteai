@@ -670,7 +670,7 @@ footer{border-top:1px solid var(--border2);padding:2.5rem 8vw;display:flex;align
 
 <!-- RESULTS OVERLAY -->
 <div id="results-overlay">
-  <button class="results-close-btn" onclick="document.getElementById('results-overlay').classList.remove('visible')" title="Close">✕</button>
+  <button class="results-close-btn" onclick="document.getElementById('results-overlay').classList.remove('visible');window.scrollTo({top:0,behavior:'smooth'});" title="Close">✕</button>
   <div class="results-overlay-inner">
     <div class="results-overlay-header">
       <div class="results-overlay-title">Your Quote Analysis</div>
@@ -1187,23 +1187,23 @@ function extractVendorName(report, num) {
 
 // RENDER RESULTS
 const sectionConfig = [
-  { key: 'BOTTOM LINE', title: 'Bottom Line', icon: 'check', color: '#00a060', bg: '#e6faf2' },
-  { key: 'MARKET PRICE CHECK', title: 'Market Price Check', icon: 'dollar', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
-  { key: 'QUOTE 1 BREAKDOWN', title: 'Quote 1 Breakdown', icon: 'doc', color: '#1a3a5c', bg: 'rgba(26,58,92,0.08)' },
-  { key: 'QUOTE 2 BREAKDOWN', title: 'Quote 2 Breakdown', icon: 'doc', color: '#1a3a5c', bg: 'rgba(26,58,92,0.08)' },
-  { key: 'COMPARISON DECISION', title: 'Comparison Decision', icon: 'star', color: '#f0a500', bg: '#fffbeb' },
-  { key: 'DECISION', title: 'Decision', icon: 'star', color: '#f0a500', bg: '#fffbeb' },
-  { key: 'TIMELINE', title: 'Timeline', icon: 'cal', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
-  { key: 'PAYMENT TERMS', title: 'Payment Terms', icon: 'card', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
-  { key: 'WARRANTY', title: 'Warranty', icon: 'shield', color: '#00a060', bg: '#e6faf2' },
-  { key: 'PRICE FAIRNESS', title: 'Price Fairness', icon: 'chart', color: '#f0a500', bg: '#fffbeb' },
-  { key: 'WHATS INCLUDED', title: "What's Included", icon: 'check', color: '#00a060', bg: '#e6faf2' },
-  { key: 'WHATS MISSING', title: "What's Missing", icon: 'alert', color: '#e53e3e', bg: '#fff5f5' },
-  { key: 'RED FLAGS', title: 'Red Flags', icon: 'flag', color: '#e53e3e', bg: '#fff5f5' },
-  { key: 'VENDOR 1 GOOGLE CHECK', title: 'Vendor 1 — Google Check', icon: 'search', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
-  { key: 'VENDOR 2 GOOGLE CHECK', title: 'Vendor 2 — Google Check', icon: 'search', color: '#0f2744', bg: 'rgba(15,39,68,0.08)' },
-  { key: 'QUESTIONS TO ASK', title: 'Questions to Ask', icon: 'question', color: '#1a3a5c', bg: 'rgba(26,58,92,0.08)' },
-  { key: 'BEST NEXT ACTION', title: 'Best Next Action', icon: 'arrow', color: '#00a060', bg: '#e6faf2' },
+  { key: 'BOTTOM LINE',           title: 'Bottom Line',            headerBg: '#1a4731', headerColor: '#fff', bodyBg: '#f0faf5' },
+  { key: 'MARKET PRICE CHECK',    title: 'Market Price Check',     headerBg: '#1e3a5f', headerColor: '#fff', bodyBg: '#f0f5ff' },
+  { key: 'QUOTE 1 BREAKDOWN',     title: 'Quote 1 Breakdown',      headerBg: '#2d4a2d', headerColor: '#fff', bodyBg: '#f5faf5' },
+  { key: 'QUOTE 2 BREAKDOWN',     title: 'Quote 2 Breakdown',      headerBg: '#2d4a2d', headerColor: '#fff', bodyBg: '#f5faf5' },
+  { key: 'COMPARISON DECISION',   title: 'Comparison Decision',    headerBg: '#7c4a00', headerColor: '#fff', bodyBg: '#fff8f0' },
+  { key: 'DECISION',              title: 'Decision',               headerBg: '#7c4a00', headerColor: '#fff', bodyBg: '#fff8f0' },
+  { key: 'TIMELINE',              title: 'Timeline',               headerBg: '#1e3a5f', headerColor: '#fff', bodyBg: '#f0f5ff' },
+  { key: 'PAYMENT TERMS',         title: 'Payment Terms',          headerBg: '#3a1e5f', headerColor: '#fff', bodyBg: '#f8f0ff' },
+  { key: 'WARRANTY',              title: 'Warranty',               headerBg: '#1a4731', headerColor: '#fff', bodyBg: '#f0faf5' },
+  { key: 'PRICE FAIRNESS',        title: 'Price Fairness',         headerBg: '#7c4a00', headerColor: '#fff', bodyBg: '#fff8f0' },
+  { key: 'WHATS INCLUDED',        title: 'Included Items',         headerBg: '#1a4731', headerColor: '#fff', bodyBg: '#f0faf5' },
+  { key: 'WHATS MISSING',         title: 'Missing Items',          headerBg: '#7a1a1a', headerColor: '#fff', bodyBg: '#fff5f5' },
+  { key: 'RED FLAGS',             title: 'Red Flags',              headerBg: '#9b1c1c', headerColor: '#fff', bodyBg: '#fff0f0' },
+  { key: 'VENDOR 1 GOOGLE CHECK', title: 'Vendor 1 — Google Check', headerBg: '#1e3a5f', headerColor: '#fff', bodyBg: '#f0f5ff' },
+  { key: 'VENDOR 2 GOOGLE CHECK', title: 'Vendor 2 — Google Check', headerBg: '#1e3a5f', headerColor: '#fff', bodyBg: '#f0f5ff' },
+  { key: 'QUESTIONS TO ASK',      title: 'Questions to Ask',       headerBg: '#3a1e5f', headerColor: '#fff', bodyBg: '#f8f0ff' },
+  { key: 'BEST NEXT ACTION',      title: 'Best Next Action',       headerBg: '#1a4731', headerColor: '#fff', bodyBg: '#f0faf5' },
 ];
 
 const icons = {
@@ -1250,12 +1250,12 @@ function renderResults(reportText, v1Reviews, v2Reviews, mode) {
     if (!content) return;
 
     const el = document.createElement('div');
-    el.style.cssText = 'background:#fff;border:1px solid rgba(26,46,26,0.1);border-radius:10px;overflow:hidden;margin-bottom:4px;';
+    el.style.cssText = 'border-radius:12px;overflow:hidden;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);';
     el.innerHTML = `
-      <div style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.25rem;background:#e8eddf;border-bottom:1px solid rgba(26,46,26,0.08);">
-        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#1a2e1a;">${cfg.title}</div>
+      <div style="padding:0.875rem 1.25rem;background:${cfg.headerBg};display:flex;align-items:center;">
+        <span style="font-size:0.875rem;font-weight:700;color:${cfg.headerColor};letter-spacing:0.02em;">${cfg.title}</span>
       </div>
-      <div style="padding:1.25rem;font-size:0.9rem;color:#3d5c3d;line-height:1.75;">${formatContent(content)}</div>`;
+      <div style="padding:1.25rem;font-size:0.9rem;color:#1a2e1a;line-height:1.8;background:${cfg.bodyBg};">${formatContent(content)}</div>`;
     container.appendChild(el);
   });
 
@@ -1370,26 +1370,36 @@ async function downloadPDF() {
 async function sendEmailReport(email, report, v1Reviews, v2Reviews) {
   try {
     let reviewText = '';
-    if (v1Reviews) reviewText += `\nVendor 1: ${v1Reviews.name} — ${v1Reviews.rating ? v1Reviews.rating.toFixed(1) + '/5' : 'No rating'} (${v1Reviews.reviews || 0} reviews)`;
-    if (v2Reviews) reviewText += `\nVendor 2: ${v2Reviews.name} — ${v2Reviews.rating ? v2Reviews.rating.toFixed(1) + '/5' : 'No rating'} (${v2Reviews.reviews || 0} reviews)`;
-
+    if (v1Reviews) reviewText += '\nVendor 1: ' + v1Reviews.name + ' — ' + (v1Reviews.rating ? v1Reviews.rating.toFixed(1) + '/5' : 'No rating') + ' (' + (v1Reviews.reviews || 0) + ' reviews)';
+    if (v2Reviews) reviewText += '\nVendor 2: ' + v2Reviews.name + ' — ' + (v2Reviews.rating ? v2Reviews.rating.toFixed(1) + '/5' : 'No rating') + ' (' + (v2Reviews.reviews || 0) + ' reviews)';
     const summary = extractSummaryForEmail(report, reviewText);
-    // Send via EmailJS
-    const emailResult = await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+
+    // Try /api/email server-side first (most reliable)
+    const resp = await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: email, report: summary.substring(0, 8000) })
+    });
+
+    if (resp.ok) {
+      console.log('Email sent via server');
+      return;
+    }
+
+    // Fallback to EmailJS
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
       to_email: email,
-      to_name: email,
       from_name: 'CheckMyQuote AI',
       reply_to: 'checkmyquoteai@gmail.com',
       subject: 'Your CheckMyQuote AI Analysis Report',
-      message: summary.substring(0, 8000),
-      email: email,
-      user_email: email,
-      name: email
+      message: summary.substring(0, 5000),
+      email: email
     });
-    console.log('Email sent:', emailResult);
+    console.log('Email sent via EmailJS');
+
   } catch(e) {
     console.error('Email send failed:', e);
-    showToast('Email failed to send. Please use the Download PDF button instead.', 'error');
+    showToast('Could not send email. Please download your PDF report.', 'error');
   }
 }
 
