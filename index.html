@@ -872,51 +872,21 @@ async function fileToText(fileData) {
   }
 }
 
-// GOOGLE PLACES
+// GOOGLE PLACES — calls server-side to avoid CORS
 async function getVendorReviews(vendorName, reportText) {
-  if (!vendorName || vendorName.length < 3) return null;
+  if (!vendorName || vendorName.length < 2) return null;
   try {
-    // Build a smarter query using info extracted from the report
-    let searchQuery = vendorName;
-    
-    // Try to extract city/location from report text
-    const cityMatch = reportText && reportText.match(/\b([A-Z][a-zA-Z]+(?:\s[A-Z][a-zA-Z]+)?),?\s*(ON|Ontario|BC|Alberta|AB|Quebec|QC|MB|SK|NS|NB|Canada|[A-Z]{2})\b/);
-    if (cityMatch) searchQuery += ' ' + cityMatch[0];
-    
-    // Try to extract phone from report
-    const phoneMatch = reportText && reportText.match(/\b(\d{3}[-.]\d{3}[-.]\d{4}|\(\d{3}\)\s*\d{3}[-.]\d{4})\b/);
-
-    // First try with location context
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${GOOGLE_KEY}`;
-    const resp = await fetch(searchUrl);
-    const data = await resp.json();
-    
-    if (data.results && data.results.length > 0) {
-      const place = data.results[0];
-      
-      // Get place details for more info (website, phone)
-      const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,rating,user_ratings_total,formatted_address,formatted_phone_number,website,reviews,opening_hours,types&key=${GOOGLE_KEY}`;
-      let details = null;
-      try {
-        const detailResp = await fetch(detailUrl);
-        const detailData = await detailResp.json();
-        if (detailData.result) details = detailData.result;
-      } catch(e) {}
-
-      return {
-        name: place.name,
-        rating: place.rating,
-        reviews: place.user_ratings_total,
-        address: place.formatted_address,
-        placeId: place.place_id,
-        phone: details?.formatted_phone_number || null,
-        website: details?.website || null,
-        topReviews: details?.reviews?.slice(0, 3) || [],
-        types: details?.types || place.types || []
-      };
-    }
-  } catch(e) { console.error('Google Places error:', e); }
-  return null;
+    const resp = await fetch('/api/places', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vendorName, reportText: (reportText || '').substring(0, 2000) })
+    });
+    if (!resp.ok) return null;
+    return await resp.json();
+  } catch(e) {
+    console.error('Places lookup error:', e);
+    return null;
+  }
 }
 
 // PROGRESS
