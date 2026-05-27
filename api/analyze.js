@@ -1,9 +1,5 @@
 export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
+  api: { bodyParser: { sizeLimit: '10mb' } }
 };
 
 export default async function handler(req, res) {
@@ -16,6 +12,12 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+
+    if (!body.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
+      console.error('Bad request - messages:', JSON.stringify(body.messages));
+      return res.status(400).json({ error: 'Messages array is empty or missing' });
+    }
+
     const part = body.part || 1;
     const mode = body.mode || 'single';
 
@@ -55,6 +57,8 @@ ${mode === 'compare' ? '## VENDOR 2 GOOGLE CHECK' : ''}
       return m;
     });
 
+    console.log('Sending to Anthropic - messages count:', messages.length, 'part:', part);
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -70,9 +74,11 @@ ${mode === 'compare' ? '## VENDOR 2 GOOGLE CHECK' : ''}
     });
 
     const data = await response.json();
+    if (!response.ok) console.error('Anthropic error:', JSON.stringify(data));
     return res.status(response.status).json(data);
 
   } catch (err) {
+    console.error('Analyze error:', err.message);
     return res.status(500).json({ error: err.message });
   }
 }
