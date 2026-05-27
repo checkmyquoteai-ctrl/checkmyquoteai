@@ -1033,6 +1033,8 @@ async function executeAnalysis(email, industry, context, mode, btn) {
 
     stopProgress();
     lastReport = reportText;
+    console.log('v1Reviews:', JSON.stringify(v1Reviews));
+    console.log('v2Reviews:', JSON.stringify(v2Reviews));
     renderResults(reportText, v1Reviews, v2Reviews, mode);
     saveAnalytics({ email, industry, type: mode, date: new Date().toISOString() });
     showToast('Analysis complete! Your report is ready.', 'success');
@@ -1232,27 +1234,30 @@ function renderResults(reportText, v1Reviews, v2Reviews, mode) {
     if (cfg.key === 'DECISION' && mode === 'compare') return;
     if (cfg.key === 'VENDOR 1 NAME' || cfg.key === 'VENDOR 2 NAME') return;
 
-    let content = sections[cfg.key] || '';
-    if (!content && cfg.key === 'QUOTE 2 BREAKDOWN') return;
+    const isV1Google = cfg.key === 'VENDOR 1 GOOGLE CHECK';
+    const isV2Google = cfg.key === 'VENDOR 2 GOOGLE CHECK';
+    const googleData = (isV1Google && v1Reviews) ? v1Reviews : (isV2Google && v2Reviews) ? v2Reviews : null;
 
-    // Inject Google reviews
-    let googleCardHTML = '';
-    if (cfg.key === 'VENDOR 1 GOOGLE CHECK' && v1Reviews) {
-      googleCardHTML = buildReviewHTML(v1Reviews);
-    }
-    if (cfg.key === 'VENDOR 2 GOOGLE CHECK' && v2Reviews) {
-      googleCardHTML = buildReviewHTML(v2Reviews);
-    }
-
-    if (!content && !googleCardHTML) return;
+    const content = sections[cfg.key] || '';
+    if (!content && !googleData) return;
 
     const el = document.createElement('div');
     el.style.cssText = 'border-radius:12px;overflow:hidden;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);';
-    el.innerHTML = `
-      <div style="padding:0.875rem 1.25rem;background:${cfg.headerBg};display:flex;align-items:center;">
-        <span style="font-size:0.875rem;font-weight:700;color:${cfg.headerColor};letter-spacing:0.02em;">${cfg.title}</span>
-      </div>
-      <div style="padding:${googleCardHTML ? '0' : '1.25rem'};font-size:0.9rem;color:#1a2e1a;line-height:1.8;background:${cfg.bodyBg};">${googleCardHTML || formatContent(content)}</div>`;
+
+    if (googleData) {
+      // Render Google card — no report text, no formatContent
+      el.innerHTML = `
+        <div style="padding:0.875rem 1.25rem;background:${cfg.headerBg};display:flex;align-items:center;">
+          <span style="font-size:0.875rem;font-weight:700;color:${cfg.headerColor};letter-spacing:0.02em;">${cfg.title}</span>
+        </div>
+        <div style="padding:0;">${buildReviewHTML(googleData)}</div>`;
+    } else {
+      el.innerHTML = `
+        <div style="padding:0.875rem 1.25rem;background:${cfg.headerBg};display:flex;align-items:center;">
+          <span style="font-size:0.875rem;font-weight:700;color:${cfg.headerColor};letter-spacing:0.02em;">${cfg.title}</span>
+        </div>
+        <div style="padding:1.25rem;font-size:0.9rem;color:#1a2e1a;line-height:1.8;background:${cfg.bodyBg};">${formatContent(content)}</div>`;
+    }
     container.appendChild(el);
   });
 
