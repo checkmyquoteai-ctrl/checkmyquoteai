@@ -14,7 +14,6 @@ export default async function handler(req, res) {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
     if (!body.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
-      console.error('Bad request - messages:', JSON.stringify(body.messages));
       return res.status(400).json({ error: 'Messages array is empty or missing' });
     }
 
@@ -42,11 +41,18 @@ ${mode === 'compare' ? '## VENDOR 2 GOOGLE CHECK' : ''}
 
     const sections = part === 1 ? part1Sections : part2Sections;
 
+    // Extract system prompt if it's embedded in the first user message
+    let systemPrompt = null;
     const messages = body.messages.map((m, i) => {
       if (i === body.messages.length - 1 && m.role === 'user') {
-        const contentArr = Array.isArray(m.content)
-          ? m.content
-          : [{ type: 'text', text: m.content }];
+        let contentArr = Array.isArray(m.content) ? m.content : [{ type: 'text', text: m.content }];
+        
+        // Extract system prompt from first text block if present
+        if (contentArr[0] && contentArr[0].type === 'text' && !systemPrompt) {
+          systemPrompt = contentArr[0].text;
+          contentArr = contentArr.slice(1); // Remove system prompt from content
+        }
+
         const lastItem = contentArr[contentArr.length - 1];
         const updatedLast = {
           ...lastItem,
@@ -57,7 +63,15 @@ ${mode === 'compare' ? '## VENDOR 2 GOOGLE CHECK' : ''}
       return m;
     });
 
-    console.log('Sending to Anthropic - messages count:', messages.length, 'part:', part);
+    const requestBody = {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1800,
+      messages
+    };
+
+    if (systemPrompt) requestBody.system = systemPrompt;
+
+    console.log('Anthropic request - model:', requestBody.model, 'messages:', messages.length, 'has system:', !!systemPrompt);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -66,11 +80,7 @@ ${mode === 'compare' ? '## VENDOR 2 GOOGLE CHECK' : ''}
         'x-api-key': process.env.ANTHROPIC_KEY,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 1800,
-        messages
-      })
+      body: JSON.stringify(requestBody)
     });
 
     const data = await response.json();
