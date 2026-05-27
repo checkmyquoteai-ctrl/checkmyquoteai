@@ -873,23 +873,49 @@ async function fileToText(fileData) {
 }
 
 // GOOGLE PLACES
-async function getVendorReviews(vendorName) {
+async function getVendorReviews(vendorName, reportText) {
   if (!vendorName || vendorName.length < 3) return null;
   try {
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(vendorName)}&key=${GOOGLE_KEY}`;
+    // Build a smarter query using info extracted from the report
+    let searchQuery = vendorName;
+    
+    // Try to extract city/location from report text
+    const cityMatch = reportText && reportText.match(/\b([A-Z][a-zA-Z]+(?:\s[A-Z][a-zA-Z]+)?),?\s*(ON|Ontario|BC|Alberta|AB|Quebec|QC|MB|SK|NS|NB|Canada|[A-Z]{2})\b/);
+    if (cityMatch) searchQuery += ' ' + cityMatch[0];
+    
+    // Try to extract phone from report
+    const phoneMatch = reportText && reportText.match(/\b(\d{3}[-.]\d{3}[-.]\d{4}|\(\d{3}\)\s*\d{3}[-.]\d{4})\b/);
+
+    // First try with location context
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${GOOGLE_KEY}`;
     const resp = await fetch(searchUrl);
     const data = await resp.json();
+    
     if (data.results && data.results.length > 0) {
       const place = data.results[0];
+      
+      // Get place details for more info (website, phone)
+      const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,rating,user_ratings_total,formatted_address,formatted_phone_number,website,reviews,opening_hours,types&key=${GOOGLE_KEY}`;
+      let details = null;
+      try {
+        const detailResp = await fetch(detailUrl);
+        const detailData = await detailResp.json();
+        if (detailData.result) details = detailData.result;
+      } catch(e) {}
+
       return {
         name: place.name,
         rating: place.rating,
         reviews: place.user_ratings_total,
         address: place.formatted_address,
-        placeId: place.place_id
+        placeId: place.place_id,
+        phone: details?.formatted_phone_number || null,
+        website: details?.website || null,
+        topReviews: details?.reviews?.slice(0, 3) || [],
+        types: details?.types || place.types || []
       };
     }
-  } catch(e) {}
+  } catch(e) { console.error('Google Places error:', e); }
   return null;
 }
 
@@ -1032,8 +1058,8 @@ async function executeAnalysis(email, industry, context, mode, btn) {
     const v1Name = extractVendorName(reportText, 1);
     const v2Name = mode === 'compare' ? extractVendorName(reportText, 2) : null;
     let v1Reviews = null, v2Reviews = null;
-    if (v1Name) v1Reviews = await getVendorReviews(v1Name);
-    if (v2Name) v2Reviews = await getVendorReviews(v2Name);
+    if (v1Name) v1Reviews = await getVendorReviews(v1Name, reportText);
+    if (v2Name) v2Reviews = await getVendorReviews(v2Name, reportText);
 
     stopProgress();
     lastReport = reportText;
@@ -1274,10 +1300,64 @@ function renderResults(reportText, v1Reviews, v2Reviews, mode) {
 }
 
 function buildReviewHTML(r) {
-  if (!r) return '';
-  const stars = r.rating ? '⭐ ' + r.rating.toFixed(1) + '/5' : 'No rating';
-  const reviews = r.reviews ? '(' + r.reviews.toLocaleString() + ' reviews)' : '';
-  return `**${r.name}** — ${stars} ${reviews}\n${r.address || ''}`;
+  if (!r) return '<p style="color:#888;font-size:0.85rem;">No Google listing found for this vendor. Try searching manually.</p>';
+  
+  // Star rating display
+  const rating = r.rating || 0;
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 >= 0.5;
+  let starsHtml = '';
+  for (let i = 0; i < 5; i++) {
+    if (i < fullStars) starsHtml += '<span style="color:#fbbc04;font-size:1.1rem;">★</span>';
+    else if (i === fullStars && halfStar) starsHtml += '<span style="color:#fbbc04;font-size:1.1rem;">★</span>';
+    else starsHtml += '<span style="color:#ddd;font-size:1.1rem;">★</span>';
+  }
+
+  // Business type badge
+  const typeMap = { 'roofing_contractor':'Roofing', 'plumber':'Plumbing', 'electrician':'Electrical', 'general_contractor':'General Contractor', 'hvac_contractor':'HVAC', 'painter':'Painting', 'flooring_store':'Flooring', 'landscaper':'Landscaping' };
+  const bizType = r.types?.map(t => typeMap[t]).filter(Boolean)[0] || '';
+
+  // Recent reviews
+  let reviewsHtml = '';
+  if (r.topReviews && r.topReviews.length > 0) {
+    reviewsHtml = '<div style="margin-top:1rem;border-top:1px solid #eee;padding-top:1rem;">';
+    reviewsHtml += '<div style="font-size:0.75rem;font-weight:600;color:#5f6368;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em;">Recent Reviews</div>';
+    r.topReviews.forEach(rev => {
+      const revStars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+      reviewsHtml += `<div style="margin-bottom:0.75rem;padding:0.75rem;background:#f8f9fa;border-radius:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
+          <span style="font-size:0.8rem;font-weight:600;color:#202124;">${rev.author_name || 'Anonymous'}</span>
+          <span style="color:#fbbc04;font-size:0.85rem;">${revStars}</span>
+        </div>
+        <p style="font-size:0.8rem;color:#5f6368;margin:0;line-height:1.5;">${(rev.text || '').substring(0, 150)}${rev.text && rev.text.length > 150 ? '...' : ''}</p>
+      </div>`;
+    });
+    reviewsHtml += '</div>';
+  }
+
+  return `<div style="background:#fff;border:1px solid #dadce0;border-radius:12px;overflow:hidden;font-family:Arial,sans-serif;">
+    <div style="padding:1.25rem 1.25rem 0.75rem;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;">
+        <div style="flex:1;">
+          <div style="font-size:1.1rem;font-weight:700;color:#202124;margin-bottom:0.2rem;">${r.name}</div>
+          ${bizType ? `<div style="display:inline-block;background:#e8f0fe;color:#1a73e8;font-size:0.72rem;font-weight:500;padding:0.15rem 0.5rem;border-radius:100px;margin-bottom:0.5rem;">${bizType}</div>` : ''}
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+            <span style="font-size:1rem;font-weight:700;color:#202124;">${rating.toFixed(1)}</span>
+            <span>${starsHtml}</span>
+            <span style="font-size:0.85rem;color:#5f6368;">(${(r.reviews || 0).toLocaleString()} reviews)</span>
+          </div>
+        </div>
+        <div style="width:48px;height:48px;background:#4285f4;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        </div>
+      </div>
+      ${r.address ? `<div style="font-size:0.82rem;color:#5f6368;display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.35rem;"><span>📍</span><span>${r.address}</span></div>` : ''}
+      ${r.phone ? `<div style="font-size:0.82rem;color:#5f6368;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;"><span>📞</span><span>${r.phone}</span></div>` : ''}
+      ${r.website ? `<div style="font-size:0.82rem;display:flex;align-items:center;gap:0.4rem;"><span>🌐</span><a href="${r.website}" target="_blank" style="color:#1a73e8;text-decoration:none;">${r.website.replace(/^https?:\/\//, '').split('/')[0]}</a></div>` : ''}
+    </div>
+    ${reviewsHtml}
+    ${r.placeId ? `<div style="padding:0.75rem 1.25rem;border-top:1px solid #eee;background:#f8f9fa;"><a href="https://www.google.com/maps/place/?q=place_id:${r.placeId}" target="_blank" style="font-size:0.82rem;color:#1a73e8;text-decoration:none;font-weight:500;">View on Google Maps →</a></div>` : ''}
+  </div>`;
 }
 
 function parseReport(text) {
