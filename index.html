@@ -1236,14 +1236,15 @@ function renderResults(reportText, v1Reviews, v2Reviews, mode) {
     if (!content && cfg.key === 'QUOTE 2 BREAKDOWN') return;
 
     // Inject Google reviews
+    let googleCardHTML = '';
     if (cfg.key === 'VENDOR 1 GOOGLE CHECK' && v1Reviews) {
-      content = buildReviewHTML(v1Reviews) + (content ? '\n\n' + content : '');
+      googleCardHTML = buildReviewHTML(v1Reviews);
     }
     if (cfg.key === 'VENDOR 2 GOOGLE CHECK' && v2Reviews) {
-      content = buildReviewHTML(v2Reviews) + (content ? '\n\n' + content : '');
+      googleCardHTML = buildReviewHTML(v2Reviews);
     }
 
-    if (!content) return;
+    if (!content && !googleCardHTML) return;
 
     const el = document.createElement('div');
     el.style.cssText = 'border-radius:12px;overflow:hidden;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);';
@@ -1251,7 +1252,7 @@ function renderResults(reportText, v1Reviews, v2Reviews, mode) {
       <div style="padding:0.875rem 1.25rem;background:${cfg.headerBg};display:flex;align-items:center;">
         <span style="font-size:0.875rem;font-weight:700;color:${cfg.headerColor};letter-spacing:0.02em;">${cfg.title}</span>
       </div>
-      <div style="padding:1.25rem;font-size:0.9rem;color:#1a2e1a;line-height:1.8;background:${cfg.bodyBg};">${formatContent(content)}</div>`;
+      <div style="padding:${googleCardHTML ? '0' : '1.25rem'};font-size:0.9rem;color:#1a2e1a;line-height:1.8;background:${cfg.bodyBg};">${googleCardHTML || formatContent(content)}</div>`;
     container.appendChild(el);
   });
 
